@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 import {
   ShieldCheck,
   BadgeIndianRupee,
@@ -235,13 +236,13 @@ export function RegistrationTermsModal({
               >
                 Cancel
               </Button>
-              <Button
+              <PrimaryButton
                 onClick={onContinue}
-                className="h-10 px-6 text-sm font-semibold bg-[#C62828] hover:bg-red-700 text-white gap-2 shadow-sm"
+                className="h-10 px-6 text-sm font-semibold gap-2 shadow-sm"
               >
                 Continue to Pay ₹99
                 <ArrowRight className="size-4" />
-              </Button>
+              </PrimaryButton>
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -73,12 +73,12 @@ export function CoachCard({
         <p className="text-[#C62828] font-bold mt-3">{fee}</p>
 
         {/* CTA */}
-        <Button
+        <PrimaryButton
           onClick={onContact}
-          className="w-full bg-[#C62828] hover:bg-red-700 text-white py-2 rounded-md mt-3 cursor-pointer"
+          className="w-full py-2 rounded-md mt-3 cursor-pointer"
         >
           Contact Coach
-        </Button>
+        </PrimaryButton>
       </div>
     </div>
   );

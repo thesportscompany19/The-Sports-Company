@@ -47,7 +47,7 @@ export function AdminSidebar() {
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative size-11 shrink-0">
             <Image
-              src="/images/logo.svg"
+              src="/images/logo.png"
               alt="The Sports Company"
               fill
               sizes="44px"

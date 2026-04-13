@@ -43,7 +43,7 @@ export function Footer() {
           <div className="flex items-center gap-3">
             <div className="relative size-16 shrink-0">
               <Image
-                src="/images/logo.svg"
+                src="/images/logo.png"
                 alt="The Sports Company"
                 fill
                 sizes="64px"

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { ArrowRight } from "lucide-react";
 import { HeroCarousel, type Slide } from "@/components/sections/HeroCarousel";
 
@@ -51,7 +52,7 @@ export function Hero({
     <section id="home" aria-label="Hero banner">
       {/* Top hero */}
       <div className="relative bg-(--secondary-color) text-white">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:py-20 md:py-24 lg:py-28 text-center">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:py-18 text-center">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
             {title}
           </h1>
@@ -60,19 +61,19 @@ export function Hero({
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a href={primaryCta.href}>
-              <Button
+              <PrimaryButton
                 size="lg"
-                className="bg-(--primary-color) hover:bg-[#B71C1C] text-white px-6 py-5 text-base h-[56px] font-medium cursor-pointer"
+                className="px-6 py-5 text-base h-14 font-medium cursor-pointer"
               >
                 {primaryCta.label}
                 <ArrowRight className="ml-2 size-4" />
-              </Button>
+              </PrimaryButton>
             </a>
             <a href={secondaryCta.href}>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white/40 text-[#0B1C2D] hover:bg-white/10 hover:text-white px-6 py-5 text-base h-[56px] font-medium cursor-pointer"
+                className="border-white/40 text-[#0B1C2D] hover:bg-white/10 hover:text-white px-6 py-5 text-base h-14 font-medium cursor-pointer"
               >
                 {secondaryCta.label}
                 <ArrowRight className="ml-2 size-4" />
@@ -84,7 +85,7 @@ export function Hero({
 
       {/* Carousel banner */}
       <div className="bg-(--secondary-color) pb-12 sm:pb-16">
-        <div className="mx-auto max-w-5xl px-4">
+        <div className="mx-auto max-w-7xl px-4">
           <HeroCarousel slides={slides} />
         </div>
       </div>

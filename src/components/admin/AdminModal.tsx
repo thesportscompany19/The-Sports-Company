@@ -2,6 +2,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { cn } from "@/lib/utils";
 
 const SIZE_CLASSES = {
@@ -67,13 +68,13 @@ export function AdminModal({
           >
             Cancel
           </Button>
-          <Button
+          <PrimaryButton
             size="sm"
-            className="bg-[#C62828] hover:bg-[#a82020] text-white min-w-28"
+            className="min-w-28"
             onClick={onSave}
           >
             {saveLabel}
-          </Button>
+          </PrimaryButton>
         </div>
       </DialogContent>
     </Dialog>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Shield } from "lucide-react";
 import { login } from "@/lib/admin-auth";
 import { cn } from "@/lib/utils";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
@@ -77,13 +78,13 @@ export default function AdminLoginPage() {
 
         <div className="relative z-10 text-center">
           {/* Logo */}
-          <div className="relative size-28 mb-6">
+          <div className="relative size-28 mb-6 mx-auto">
             <Image
-              src="/images/logo.svg"
+              src="/images/logo.png"
               alt="The Sports Company"
               fill
-              sizes="112px"
-              className="object-contain drop-shadow-2xl"
+              sizes="120px"
+              className="object-cover drop-shadow-2xl"
               priority
               unoptimized
             />
@@ -121,7 +122,7 @@ export default function AdminLoginPage() {
           <div className="lg:hidden flex items-center gap-3 mb-8">
             <div className="relative size-11 shrink-0">
               <Image
-                src="/images/logo.svg"
+                src="/images/logo.png"
                 alt="The Sports Company"
                 fill
                 sizes="44px"
@@ -211,12 +212,11 @@ export default function AdminLoginPage() {
               </div>
 
               {/* Submit */}
-              <button
+              <PrimaryButton
                 type="submit"
                 disabled={loading}
                 className={cn(
-                  "w-full py-3 rounded-lg text-sm font-semibold transition-all mt-2",
-                  "bg-[#C62828] hover:bg-[#a82020] text-white shadow-sm",
+                  "w-full py-3 rounded-lg text-sm font-semibold transition-all mt-2 h-auto",
                   loading && "opacity-60 cursor-not-allowed"
                 )}
               >
@@ -228,7 +228,7 @@ export default function AdminLoginPage() {
                 ) : (
                   "Sign In to Dashboard"
                 )}
-              </button>
+              </PrimaryButton>
             </form>
 
             {/* Hint */}

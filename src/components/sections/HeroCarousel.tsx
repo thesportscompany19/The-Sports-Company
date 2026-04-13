@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 import {
   Carousel,
   CarouselContent,
@@ -97,13 +98,13 @@ export function HeroCarousel({
                 </p>
                 {slide.ctaLabel && (
                   <a href={slide.ctaHref ?? "#"}>
-                    <Button
+                    <PrimaryButton
                       size="lg"
-                      className="mt-4 bg-[#C62828] hover:bg-red-700 text-white rounded-lg px-6 py-3 h-[56px] text-sm font-medium cursor-pointer"
+                      className="mt-4 rounded-lg px-6 py-3 h-[56px] text-sm font-medium cursor-pointer"
                     >
                       {slide.ctaLabel}
                       <ArrowRight className="ml-2 size-4" />
-                    </Button>
+                    </PrimaryButton>
                   </a>
                 )}
               </div>

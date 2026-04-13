@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -58,12 +58,12 @@ export function WellnessCard({
         </div>
 
         {/* CTA */}
-        <Button
+        <PrimaryButton
           onClick={onBook}
-          className="w-full bg-[#C62828] hover:bg-red-700 text-white py-2 rounded-md mt-3 cursor-pointer"
+          className="w-full py-2 rounded-md mt-3 cursor-pointer"
         >
           Book Session
-        </Button>
+        </PrimaryButton>
       </div>
     </div>
   );

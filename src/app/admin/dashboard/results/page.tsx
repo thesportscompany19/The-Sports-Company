@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Plus, Search, Edit2, Trash2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -143,9 +144,9 @@ export default function ResultsPage() {
           <h2 className="text-xl font-bold text-[#0B1C2D]">Recent Results</h2>
           <p className="text-sm text-gray-400 mt-0.5">{items.length} recorded results</p>
         </div>
-        <Button onClick={openAdd} className="bg-[#C62828] hover:bg-[#a82020] text-white gap-2 shadow-sm">
+        <PrimaryButton onClick={openAdd} className="gap-2 shadow-sm">
           <Plus className="size-4" /> Add Result
-        </Button>
+        </PrimaryButton>
       </div>
 
       {/* Filters */}

@@ -23,7 +23,7 @@ export function GoToTop() {
       className={[
         "fixed bottom-8 right-6 z-50 flex items-center justify-center",
         "w-11 h-11 rounded-full shadow-lg",
-        "bg-(--primary-color) text-white",
+        "bg-(--primary-color) text-black/80",
         "border-2 border-white/20",
         "hover:scale-110 hover:shadow-[0_0_16px_rgba(198,40,40,0.5)]",
         "active:scale-95",

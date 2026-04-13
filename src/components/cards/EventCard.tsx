@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, IndianRupee, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -71,12 +72,12 @@ export function EventCard({
 
         {/* Buttons */}
         <div className="flex gap-3 mt-4">
-          <Button
+          <PrimaryButton
             onClick={onRegister}
-            className="bg-[#C62828] hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm cursor-pointer"
+            className="px-4 py-2 rounded-md text-sm cursor-pointer"
           >
             Register
-          </Button>
+          </PrimaryButton>
           <Button
             variant="outline"
             onClick={onViewDetails}

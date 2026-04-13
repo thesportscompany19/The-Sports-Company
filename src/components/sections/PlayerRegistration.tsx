@@ -6,6 +6,7 @@ import { FormField } from "@/components/form/FormField";
 import { SportsSelectCard } from "@/components/form/SportsSelectCard";
 import { RegistrationTermsModal } from "@/components/form/RegistrationTermsModal";
 import { Button } from "@/components/ui/button";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -244,7 +245,7 @@ export function PlayerRegistration({
         onClose={() => setShowTermsModal(false)}
       />
 
-      <div className="max-w-4xl mx-auto bg-gray-100 rounded-2xl shadow-md p-6 md:p-10">
+      <div className="max-w-7xl mx-auto bg-gray-100 rounded-2xl shadow-md p-6 md:p-10">
         <form onSubmit={handleSubmit} noValidate>
 
           {/* ── Personal Details ─────────────────────────────── */}
@@ -363,13 +364,13 @@ export function PlayerRegistration({
 
           {/* ── CTA ──────────────────────────────────────────── */}
           <div className="mt-8 flex justify-center md:justify-end">
-            <Button
+            <PrimaryButton
               type="submit"
               disabled={isSubmitting}
-              className="bg-[#C62828] hover:bg-red-700 text-white w-full md:w-auto px-8 py-3 h-auto rounded-lg text-base font-semibold cursor-pointer disabled:opacity-50"
+              className="w-full md:w-auto px-8 py-3 h-auto rounded-lg text-base font-semibold cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? "Registering..." : "Pay ₹99 & Register Now"}
-            </Button>
+            </PrimaryButton>
           </div>
         </form>
       </div>
