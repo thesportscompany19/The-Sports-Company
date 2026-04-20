@@ -47,35 +47,6 @@ export function RulesContent({ data, className }: RulesContentProps) {
         </div>
       </section>
 
-      {/* Scoring System */}
-      <section>
-        <h3 className="font-semibold text-[#0B1C2D] text-base mb-2">
-          Scoring System
-        </h3>
-        <ul className="space-y-2">
-          {data.scoringSystem.map((rule, i) => (
-            <li key={i} className="flex gap-2 text-sm text-gray-600">
-              <span className="mt-1 size-1.5 rounded-full bg-[#C62828] shrink-0" />
-              {rule}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Disqualification Rules */}
-      <section>
-        <h3 className="font-semibold text-[#0B1C2D] text-base mb-2">
-          Disqualification Rules
-        </h3>
-        <div className="border-l-4 border-[#C62828] bg-red-50 rounded-r-lg p-3 mt-2 space-y-2">
-          {data.disqualificationRules.map((rule, i) => (
-            <p key={i} className="text-sm text-gray-700">
-              {rule}
-            </p>
-          ))}
-        </div>
-      </section>
-
       {/* Footer note */}
       <p className="text-xs text-gray-400 text-center mt-6">
         * Rules are subject to change. Please check with the tournament organiser for the latest version.

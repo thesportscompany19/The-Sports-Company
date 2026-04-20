@@ -7,19 +7,21 @@ import { RulesContent, type RulesData } from "@/components/rules/RulesContent";
 const SPORT_TABS = [
   { value: "cricket",     label: "Cricket",      icon: "🏏" },
   { value: "football",    label: "Football",     icon: "⚽" },
-  { value: "basketball",  label: "Basketball",   icon: "🏀" },
   { value: "tennis",      label: "Tennis",       icon: "🎾" },
   { value: "badminton",   label: "Badminton",    icon: "🏸" },
   { value: "tabletennis", label: "Table Tennis", icon: "🏓" },
-  { value: "hockey",      label: "Hockey",       icon: "🏑" },
-  { value: "volleyball",  label: "Volleyball",   icon: "🏐" },
+  { value: "swimming",    label: "Swimming",     icon: "🏊" },
+  { value: "chess",       label: "Chess",        icon: "♟️" },
+  { value: "skating",     label: "Skating",      icon: "🛼" },
+  { value: "pickleball",  label: "Pickleball",   icon: "🏓" },
+  { value: "athletics",   label: "Athletics",    icon: "🏃" },
 ];
 
 const RULES_DATA: Record<string, RulesData> = {
   cricket: {
     overview:
-      "Cricket is played between two teams of 11 players each. The game is played on a cricket ground with a rectangular pitch in the centre. Teams alternate between batting and fielding; the team with the most runs at the end wins.",
-    ageCategories: ["Under-14", "Under-17", "Under-19", "Under-23", "Open"],
+      " Governed by the International Cricket Council, is played between two teams of 11 players where one team bats to score runs and the other bowls and fields to restrict runs and take wickets; matches can be played in formats like T20 (20 overs), ODI (50 overs), or Test (5 days), and a team wins by scoring more runs than the opponent, with rules including dismissals like bowled, caught, LBW, and run-out.",
+    ageCategories: ["Under-12", "Under-14", "Under-16", "Under-19", "Senior (open)"],
     scoringSystem: [
       "Each run scored by the batting team adds 1 point.",
       "Boundaries: 4 runs (ground contact), 6 runs (clean over boundary).",
@@ -35,8 +37,8 @@ const RULES_DATA: Record<string, RulesData> = {
   },
   football: {
     overview:
-      "Football (soccer) is a team sport played between two sides of 11 players. The objective is to score by putting the ball into the opposing team's goal. The team with the most goals after 90 minutes wins.",
-    ageCategories: ["Under-12", "Under-15", "Under-17", "Under-21", "Open"],
+      "Governed by the FIFA, is played between two teams of 11 players each, where the objective is to score goals by getting the ball into the opponent's net without using hands or arms (except the goalkeeper); matches are typically 90 minutes long, divided into two halves of 45 minutes each, and the team with more goals wins, while rules include offsides, fouls, free kicks, penalties, and throw-ins.",
+    ageCategories: ["Under-10", "Under-12", "Under-14", "Under-16", "Under-18", "Senior", "Masters/Veterans (35+, 40+)"],
     scoringSystem: [
       "Each goal counts as 1 point.",
       "Penalty shoot-outs used to decide draws in knockout rounds.",
@@ -50,27 +52,10 @@ const RULES_DATA: Record<string, RulesData> = {
       "Fielding an ineligible player results in a 3-0 forfeit.",
     ],
   },
-  basketball: {
-    overview:
-      "Basketball is a team sport in which two teams of five players compete to shoot a ball through the opposing team's hoop. Games consist of four quarters; the highest-scoring team wins.",
-    ageCategories: ["Under-14", "Under-16", "Under-18", "Under-21", "Open"],
-    scoringSystem: [
-      "Field goal (inside arc): 2 points.",
-      "Three-point shot (outside arc): 3 points.",
-      "Free throw: 1 point each.",
-      "Overtime periods of 5 minutes to break ties.",
-    ],
-    disqualificationRules: [
-      "Five personal fouls result in disqualification from the match.",
-      "A flagrant-2 foul results in immediate ejection.",
-      "Unsportsmanlike conduct after a technical foul leads to ejection.",
-      "Any form of match manipulation results in tournament disqualification.",
-    ],
-  },
   tennis: {
     overview:
-      "Tennis is an individual or doubles sport played on a rectangular court. Players use rackets to hit a ball over a net, scoring points through a defined system of love, 15, 30, 40, and game.",
-    ageCategories: ["Under-12", "Under-14", "Under-18", "Open", "Veterans (35+)"],
+      "Governed by the International Tennis Federation, is played in singles or doubles where players score points by hitting the ball over the net into the opponent's court, aiming to win points when the opponent fails to return it; matches are usually played as best of 3 or 5 sets, with each set won by reaching 6 games (with at least a 2-game lead), and scoring follows the sequence 15, 30, 40, and game. Players must serve diagonally into the service box, and faults like double bounce or hitting outside boundaries result in loss of point.",
+    ageCategories: ["Under-10", "Under-12", "Under-14", "Under-16", "Under-18", "Senior", "Masters (35+, 40+, 45+, 50+)"],
     scoringSystem: [
       "Points: Love (0), 15, 30, 40; deuce at 40-40 requires two consecutive points.",
       "Six games win a set; tiebreak at 6-6.",
@@ -86,8 +71,8 @@ const RULES_DATA: Record<string, RulesData> = {
   },
   badminton: {
     overview:
-      "Badminton is a racket sport played by opposing players (singles) or pairs (doubles) using a shuttlecock across a high net. Rally-point scoring is used; the side winning a rally scores a point.",
-    ageCategories: ["Under-13", "Under-15", "Under-17", "Under-19", "Open"],
+      "Governed by the Badminton World Federation, is played in singles or doubles where players score points by hitting the shuttlecock over the net and landing it within the opponent's court; matches are played as best of 3 games, each up to 21 points with a 2-point lead required, and a rally-point system is used where a point is scored on every serve. Players must serve diagonally, below the waist, and stay within court boundaries during play.",
+    ageCategories: ["Under-11", "Under-13", "Under-15", "Under-17", "Under-19", "Senior (open)", "Masters (35+, 40+, 45+, 50+)"],
     scoringSystem: [
       "Best of 3 games; each game played to 21 points.",
       "A side must win by 2 points; game cap is 30-29.",
@@ -103,12 +88,12 @@ const RULES_DATA: Record<string, RulesData> = {
   },
   tabletennis: {
     overview:
-      "Table Tennis (ping-pong) is played on a hard table divided by a net. Players hit a lightweight ball back and forth using small rackets. Fast-paced rallies and spin are central to the sport.",
-    ageCategories: ["Under-12", "Under-15", "Under-18", "Under-21", "Open"],
+      " Governed by the International Table Tennis Federation, is played between two (singles) or four players (doubles) where the objective is to score points by making the ball land on the opponent’s side without a valid return; games are usually played up to 11 points with at least a 2-point lead, and matches are typically best of 5 or 7 games. Players must serve diagonally in doubles and follow rules like alternating serves every 2 points.",
+    ageCategories: ["Under-11", "Under-13", "Under-15", "Under-17", "Under-19 (junior level)",],
     scoringSystem: [
-      "Each game is played to 11 points; must win by 2.",
-      "Best of 5 or 7 games depending on the round.",
-      "Service alternates every 2 points; both sides serve at 10-10.",
+      "Games played to 11 points (must win by 2).",
+      "Best of 5 or 7 games in match play.",
+      "Service alternates every 2 points in game play.",
       "Expedite rule applied if a game exceeds 10 minutes.",
     ],
     disqualificationRules: [
@@ -118,38 +103,89 @@ const RULES_DATA: Record<string, RulesData> = {
       "Coaching during play is prohibited in singles events.",
     ],
   },
-  hockey: {
+  swimming: {
     overview:
-      "Field Hockey is a team sport played on a grass or synthetic turf field. Two teams of 11 players each use sticks to drive a ball into the opposing team's goal. Teams play two halves of 35 minutes each.",
-    ageCategories: ["Under-14", "Under-16", "Under-18", "Under-21", "Open"],
+      "Governed by the FINA (now known as World Aquatics), is a competitive sport where swimmers race in a pool using different strokes like freestyle, backstroke, breaststroke, and butterfly, aiming to complete the set distance in the shortest time; races start with a dive (except backstroke), and swimmers must follow proper technique rules for each stroke, including legal turns and finishes, or they may be disqualified.",
+    ageCategories: ["Under-8", "Under-10", "Under-12", "Under-14", "Under-16", "Under-18", "Senior", "Masters (25+)"],
     scoringSystem: [
-      "Each goal counts as 1 point.",
-      "Goals can only be scored from within the shooting circle.",
-      "Penalty corners and penalty strokes awarded for specific infractions.",
-      "Stroke-off (similar to penalty shootout) used in tied knockout matches.",
+      "Races are won by the shortest completion time.",
+      "Fastest time in qualifying heats advances to finals.",
+      "Athletes must complete the full distance and touch the wall at the finish.",
+      "Relay teams score based on combined individual times.",
     ],
     disqualificationRules: [
-      "Dangerous play (raised ball above shoulder height) results in a free hit or penalty corner.",
-      "A green card = 2-minute suspension; yellow card = 5–10 minutes; red card = ejection.",
-      "Persistent misconduct after two cards leads to match disqualification.",
-      "Use of non-regulation equipment results in forfeiture of the match.",
+      "Improper stroke technique results in disqualification.",
+      "False start after warning leads to disqualification.",
+      "Not touching the wall properly at the turn results in disqualification.",
+      "Interfering with other swimmers leads to immediate disqualification.",
     ],
   },
-  volleyball: {
+  chess: {
     overview:
-      "Volleyball is a team sport in which two teams of six players are separated by a net. Each team tries to score points by grounding a ball on the other team's court. Rally-point scoring is used.",
-    ageCategories: ["Under-14", "Under-16", "Under-18", "Under-21", "Open"],
+      "Governed by the FIDE, is played between two players on a 64-square board where the objective is to checkmate the opponent's king; each piece moves in a specific way (like bishops diagonally, rooks straight, knights in L-shape), and the game can also end in a draw by stalemate, repetition, or agreement, while official matches often use time controls (like rapid or classical) with clocks to limit thinking time. There are several tactics in chess, here are some key ones: Pins, Forks, Skewer, Discovered attacks, Double attacks, Overloading, Deflection, X-ray attacks. Three phases of chess: Opening: Develop pieces, control center, and get your king safe (castling). Middlegame: Attack, defend, and strategize to gain an advantage. Endgame: Convert advantages into wins, often focusing on pawns and king activity. Some important rules: Castling: Move king to opposite side of rook, with no pieces in between, and king not in check. En passant: Capture pawn as if it moved two squares, but only on next move. Promotion: Pawn reaches end, becomes any piece (usually queen).",
+    ageCategories: ["Under-7", "Under-9", "Under-11", "Under-13", "Under-15", "Under-17", "Under-19", "Open", "Veterans (50+)"],
     scoringSystem: [
-      "Each game (set) is played to 25 points, with a 2-point lead required to win.",
-      "Deciding set (5th) is played to 15 points with a 2-point lead.",
-      "Best of 5 sets; first team to win 3 sets wins the match.",
-      "Every rally results in a point for the winning side (rally-point system).",
+      "Win = 1 point, Draw = 0.5 point, Loss = 0 points.",
+      "Best of 3 or 5 games in match play.",
+      "Ratings determined by tournament results and FIDE rating system.",
+      "Time controls vary: Rapid, Classical, and Blitz formats.",
     ],
     disqualificationRules: [
-      "Touching the net during play results in a point for the opponent.",
-      "Receiving four sanctions (yellow+red combination) leads to disqualification.",
-      "A red card for rude conduct results in immediate disqualification.",
-      "Blocking a serve is prohibited and results in a replay or point loss.",
+      "Touching a piece without intention to move results in penalties.",
+      "Exceeding time limit results in immediate loss.",
+      "Using external assistance or electronic devices leads to disqualification.",
+      "Unsportsmanlike conduct results in match forfeit and tournament ban.",
+    ],
+  },
+  skating: {
+    overview:
+      "Governed by the World Skate, is a sport where players race or perform on skates, aiming to complete the distance in the shortest time or execute skills with balance and control; in racing events, skaters must stay within track limits, avoid fouls like pushing or obstruction, and follow proper start and finish rules, while in artistic skating, scoring is based on technique, creativity, and execution.",
+    ageCategories: ["Under-6", "Under-8", "Under-10", "Under-12", "Under-14", "Under-17", "Senior", "Masters (35+)"],
+    scoringSystem: [
+      "Racing: Fastest time wins the event.",
+      "Artistic: Judged on technique, creativity, and execution (points awarded by judges).",
+      "Obstacle course: Based on time and penalty points for mistakes.",
+      "Relay events: Combined times of all team members determine placement.",
+    ],
+    disqualificationRules: [
+      "Pushing or obstructing other skaters results in disqualification.",
+      "Skates must meet regulation standards or athlete is disqualified.",
+      "Leaving track boundaries during a race results in disqualification.",
+      "Unsafe equipment or improper attire leads to disqualification.",
+    ],
+  },
+  pickleball: {
+    overview:
+      "Governed internationally by the International Federation of Pickleball, is played in singles or doubles on a small court where players use paddles to hit a perforated ball over the net, aiming to score points by making the opponent miss or fault; games are usually played to 11 points (win by 2), only the serving side can score, and key rules include the underhand serve, the double-bounce rule (ball must bounce once on each side before volleys), and the non-volley zone (kitchen) where volleys are not allowed.",
+    ageCategories: ["Under-12", "Under-14", "Under-16", "Under-18", "Senior", "Masters (35+, 40+, 50+)"],
+    scoringSystem: [
+      "Games played to 11 points (must win by 2).",
+      "Only the serving side can score points.",
+      "Best of 3 games in match play.",
+      "Doubles: Server calls their score, opponent's score, and game number.",
+    ],
+    disqualificationRules: [
+      "Vollying in the non-volley zone (kitchen) results in loss of point.",
+      "Ball must bounce once on each side before volleys (double-bounce rule).",
+      "Serve must be underhand and below waist level.",
+      "Hitting above net level or into the net on serve results in side-out.",
+    ],
+  },
+  athletics: {
+    overview:
+      "Governed by World Athletics, includes track and field events such as running, jumping, and throwing, where athletes compete to achieve the fastest time, longest distance, or highest height; rules vary by event—for example, runners must stay in their lanes in sprint races, false starts lead to disqualification, and field events like long jump or shot put require proper technique and valid attempts within marked areas.",
+    ageCategories: ["Under-10", "Under-12", "Under-14", "Under-16", "Under-18", "Under-20", "Senior", "Masters (35+, 40+, 50+)"],
+    scoringSystem: [
+      "Track: Fastest time wins; measured in hundredths of a second.",
+      "Field: Longest distance or highest height wins.",
+      "Relays: Combined times of all team members determine placement.",
+      "Points awarded in multi-event competitions based on placement.",
+    ],
+    disqualificationRules: [
+      "False start in sprint races results in disqualification.",
+      "Stepping out of lane in sprints results in disqualification.",
+      "Improper technique in field events leads to invalid attempts.",
+      "Doping or banned substance use results in immediate disqualification and ban.",
     ],
   },
 };

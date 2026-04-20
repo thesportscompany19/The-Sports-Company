@@ -36,7 +36,7 @@ export function Header({
   ctaHref = "#register",
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 w-full bg-(--secondary-color) border-b border-white/10 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full bg-[#042457] border-b border-white/10 backdrop-blur-sm">
       <div className="mx-auto flex h-22 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 shrink-0 group">
@@ -65,7 +65,7 @@ export function Header({
         <div className="flex items-center gap-4">
           <Navbar navItems={navItems} />
           {ctaLabel && (
-            <Link href={ctaHref} className="hidden nav:block">
+            <Link href={ctaHref} className="hidden lg:block">
               <PrimaryButton className="text-sm font-medium px-4">
                 {ctaLabel}
                 <ArrowRight className="ml-1 size-4" />

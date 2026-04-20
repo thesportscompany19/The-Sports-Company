@@ -64,10 +64,7 @@ function loadRazorpayScript(): Promise<boolean> {
 const SPORTS = [
   { name: "Cricket",     icon: "/images/svg/bat.png" },
   { name: "Football",    icon: "/images/svg/football.png" },
-  { name: "Basketball",  icon: "/images/svg/basket.png" },
   { name: "Badminton",   icon: "/images/svg/bedminton.png" },
-  { name: "Hockey",      icon: "/images/svg/handball.png" },
-  { name: "Volleyball",  icon: "/images/svg/hacky.png" },
   { name: "Swimming",    icon: "/images/svg/swimming.png" },
   { name: "Athletics",   icon: "/images/svg/athletics.png" },
   { name: "Tennis",      icon: "/images/svg/ball.png" },

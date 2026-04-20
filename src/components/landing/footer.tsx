@@ -26,10 +26,10 @@ const PLAYER_LINKS = [
 ];
 
 const SOCIAL = [
-  { icon: <Facebook className="size-4" />, label: "Facebook",  href: "#" },
-  { icon: <Twitter  className="size-4" />, label: "Twitter",   href: "#" },
-  { icon: <Instagram className="size-4" />, label: "Instagram", href: "#" },
-  { icon: <Linkedin className="size-4" />, label: "LinkedIn",  href: "#" },
+  { icon: <Facebook className="size-4" />, label: "Facebook", href: "https://www.facebook.com/profile.php?id=61581648660299" },
+  { icon: <Twitter className="size-4" />, label: "Twitter", href: "#" },
+  { icon: <Instagram className="size-4" />, label: "Instagram", href: "https://www.instagram.com/thesportscompany19/?hl=en" },
+  { icon: <Linkedin className="size-4" />, label: "LinkedIn", href: "#" },
 ];
 
 export function Footer() {
@@ -52,13 +52,15 @@ export function Footer() {
               />
             </div>
             <div>
-              <h3 className="text-lg font-extrabold text-white leading-tight">
-                The <span className="text-[#C62828]">Sports Company</span>
+              <h3 className="text-base font-extrabold text-white leading-tight">
+                The <span className="text-(--primary-color)">Sports Company</span>
               </h3>
-              <p className="text-white/40 text-[10px] uppercase tracking-wider mt-0.5">Your Complete Sports Ecosystem</p>
+              <p className="text-white/60 text-[11px] uppercase tracking-wider mt-0.5">
+                Your Complete Sports Ecosystem
+              </p>
             </div>
           </div>
-          <p className="text-gray-400 text-sm leading-relaxed">
+          <p className="text-gray-300 text-sm leading-relaxed max-w-md">
             India's premier grassroots sports platform — connecting players, coaches, and tournaments across the country.
           </p>
           <div className="flex gap-3 mt-1">
@@ -77,13 +79,15 @@ export function Footer() {
 
         {/* Col 2 — Quick Links */}
         <div>
-          <h4 className="font-semibold text-white mb-4">Quick Links</h4>
+          <h4 className="text-sm font-semibold text-white/90 mb-4 tracking-wide">
+            Quick Links
+          </h4>
           <ul className="space-y-2">
             {QUICK_LINKS.map((link) => (
               <li key={link}>
                 <a
                   href="#"
-                  className="text-gray-400 text-sm hover:text-[#C62828] transition-colors"
+                  className="text-gray-300 text-sm hover:text-(--primary-color) transition-colors"
                 >
                   {link}
                 </a>
@@ -94,13 +98,15 @@ export function Footer() {
 
         {/* Col 3 — For Players */}
         <div>
-          <h4 className="font-semibold text-white mb-4">For Players</h4>
+          <h4 className="text-sm font-semibold text-white/90 mb-4 tracking-wide">
+            For Players
+          </h4>
           <ul className="space-y-2">
             {PLAYER_LINKS.map((link) => (
               <li key={link}>
                 <a
                   href="#"
-                  className="text-gray-400 text-sm hover:text-[#C62828] transition-colors"
+                  className="text-gray-300 text-sm hover:text-(--primary-color) transition-colors"
                 >
                   {link}
                 </a>
@@ -111,25 +117,27 @@ export function Footer() {
 
         {/* Col 4 — Contact */}
         <div>
-          <h4 className="font-semibold text-white mb-4">Contact Us</h4>
-          <ul className="space-y-3">
-            <li className="flex items-start gap-2 text-sm text-gray-400">
-              <MapPin className="size-4 text-[#C62828] shrink-0 mt-0.5" />
-              <span>
+          <h4 className="text-sm font-semibold text-white/90 mb-4 tracking-wide">
+            Contact Us
+          </h4>
+          <ul className="space-y-3 text-sm text-gray-300">
+            <li className="flex items-start gap-2 text-sm text-gray-300">
+              <MapPin className="size-4 text-(--primary-color) shrink-0 mt-0.5" />
+              <span className="leading-relaxed">
                 The Sports Company Pvt. Ltd., 4th Floor, SB Road,
                 <br />
                 Pune, Maharashtra – 411016
               </span>
             </li>
-            <li className="flex items-center gap-2 text-sm text-gray-400">
-              <Phone className="size-4 text-[#C62828] shrink-0" />
-              <a href="tel:+917901845116" className="hover:text-[#C62828] transition-colors">
+            <li className="flex items-center gap-2 text-sm text-gray-300">
+              <Phone className="size-4 text-(--primary-color) shrink-0" />
+              <a href="tel:+917901845116" className="hover:text-(--primary-color) transition-colors">
                 +91 79018 45116
               </a>
             </li>
-            <li className="flex items-center gap-2 text-sm text-gray-400">
-              <Mail className="size-4 text-[#C62828] shrink-0" />
-              <a href="mailto:support@thesportscompany.co.in" className="hover:text-[#C62828] transition-colors">
+            <li className="flex items-center gap-2 text-sm text-gray-300">
+              <Mail className="size-4 text-(--primary-color) shrink-0" />
+              <a href="mailto:support@thesportscompany.co.in" className="hover:text-(--primary-color) transition-colors">
                  support@thesportscompany.co.in
               </a>
             </li>
@@ -139,14 +147,14 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-gray-400">
           <p>© 2026 The Sports Company. All rights reserved.</p>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             {["Privacy Policy", "Terms of Service", "Admin Login"].map((item) => (
               <a
                 key={item}
                 href="#"
-                className="hover:text-[#C62828] transition-colors"
+                className="hover:text-(--primary-color) transition-colors"
               >
                 {item}
               </a>

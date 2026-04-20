@@ -49,9 +49,10 @@ export function Hero({
   slides = defaultSlides,
 }: HeroProps) {
   return (
-    <section id="home" aria-label="Hero banner">
+    <section id="home" aria-label="Hero banner" className="relative overflow-hidden bg-cover bg-center text-white"
+        style={{ backgroundImage: "url('/images/banner.png')" }} >
       {/* Top hero */}
-      <div className="relative bg-(--secondary-color) text-white">
+      <div className="relative bg-[#042457]/80 text-white">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:py-18 text-center">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
             {title}
@@ -84,7 +85,7 @@ export function Hero({
       </div>
 
       {/* Carousel banner */}
-      <div className="bg-(--secondary-color) pb-12 sm:pb-16">
+      <div className="bg-[#042457]/80 pb-12 sm:pb-16">
         <div className="mx-auto max-w-7xl px-4">
           <HeroCarousel slides={slides} />
         </div>

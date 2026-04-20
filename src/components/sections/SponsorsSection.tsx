@@ -1,15 +1,7 @@
 "use client";
 
+import Image from "next/image";
 import { SectionWrapper } from "@/components/common/SectionWrapper";
-
-const SPONSORS = [
-  { name: "Nike",         href: "#" },
-  { name: "Adidas",       href: "#" },
-  { name: "Puma",         href: "#" },
-  { name: "Reebok",       href: "#" },
-  { name: "Under Armour", href: "#" },
-  { name: "New Balance",  href: "#" },
-];
 
 interface SponsorsSectionProps {
   title?: string;
@@ -21,19 +13,25 @@ export function SponsorsSection({
   subtitle = "Proudly supported by the world's leading sports brands",
 }: SponsorsSectionProps) {
   return (
-    // className="bg-[#F4F6F8]"
     <SectionWrapper title={title} subtitle={subtitle}>
-      <div className="flex flex-wrap justify-center items-center gap-10 mt-6">
-        {SPONSORS.map((sponsor) => (
-          <a
-            key={sponsor.name}
-            href={sponsor.href}
-            className="text-gray-400 font-semibold text-lg tracking-wide transition-colors hover:text-[#0B1C2D] select-none"
-            aria-label={sponsor.name}
-          >
-            {sponsor.name}
-          </a>
-        ))}
+      <div className="flex justify-center items-center mt-10">
+        <a
+          href="#"
+          className="inline-flex items-center justify-center p-8 bg-white rounded-2xl border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 group"
+          aria-label="Aravalli Hills Organics"
+          title="Aravalli Hills Organics"
+        >
+          <div className="relative w-full max-w-sm">
+            <Image
+              src="/images/sponsor.jpeg"
+              alt="Aravalli Hills Organics"
+              width={300}
+              height={150}
+              className="object-cover w-full h-auto filter opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+              unoptimized
+            />
+          </div>
+        </a>
       </div>
     </SectionWrapper>
   );
