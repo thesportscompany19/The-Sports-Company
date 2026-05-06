@@ -18,7 +18,6 @@ interface HeaderProps {
 const defaultNavItems: NavItem[] = [
   { label: "Home", href: "#" },
   { label: "Sports", href: "#sports" },
-  { label: "About", href: "#about" },
   { label: "Events", href: "#events" },
   { label: "Register", href: "#register" },
   { label: "Coaches", href: "#coaches" },
@@ -26,6 +25,7 @@ const defaultNavItems: NavItem[] = [
   { label: "Rules", href: "#rules" },
   { label: "Wellness", href: "#wellness" },
   { label: "Media", href: "#media" },
+    { label: "About", href: "#about" },
 ];
 
 export function Header({

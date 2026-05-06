@@ -34,7 +34,7 @@ const SOCIAL = [
 
 export function Footer() {
   return (
-    <footer className="bg-[#0B1C2D] text-white">
+    <footer className="bg-[#042457] text-white">
       {/* Main grid */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
@@ -69,7 +69,7 @@ export function Footer() {
                 key={s.label}
                 href={s.href}
                 aria-label={s.label}
-                className="size-8 rounded-md bg-white/10 flex items-center justify-center text-gray-300 hover:bg-[#C62828] hover:text-white transition-colors"
+                className="size-8 rounded-md bg-white/10 flex items-center justify-center text-gray-300 hover:bg-[#f0e140] hover:text-black transition-colors"
               >
                 {s.icon}
               </a>
@@ -124,9 +124,11 @@ export function Footer() {
             <li className="flex items-start gap-2 text-sm text-gray-300">
               <MapPin className="size-4 text-(--primary-color) shrink-0 mt-0.5" />
               <span className="leading-relaxed">
-                The Sports Company Pvt. Ltd., 4th Floor, SB Road,
+                The Sports Company
+                481 
                 <br />
-                Pune, Maharashtra – 411016
+                Sector 25 Panchkula Haryana
+                134116
               </span>
             </li>
             <li className="flex items-center gap-2 text-sm text-gray-300">
@@ -138,7 +140,7 @@ export function Footer() {
             <li className="flex items-center gap-2 text-sm text-gray-300">
               <Mail className="size-4 text-(--primary-color) shrink-0" />
               <a href="mailto:support@thesportscompany.co.in" className="hover:text-(--primary-color) transition-colors">
-                 support@thesportscompany.co.in
+                support@thesportscompany.co.in
               </a>
             </li>
           </ul>

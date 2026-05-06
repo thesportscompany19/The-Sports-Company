@@ -21,7 +21,7 @@ export function SponsorsSection({
           aria-label="Aravalli Hills Organics"
           title="Aravalli Hills Organics"
         >
-          <div className="relative w-full max-w-sm">
+          <div className="relative w-full max-w-3xs">
             <Image
               src="/images/sponsor.jpeg"
               alt="Aravalli Hills Organics"

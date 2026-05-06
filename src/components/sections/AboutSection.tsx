@@ -64,7 +64,7 @@ export function AboutSection() {
             About{" "}
             <span className="relative inline-block">
               The Sports Company
-              <span className="absolute -bottom-1 left-0 right-0 h-1 bg-[#C62828] rounded-full" />
+              {/* <span className="absolute -bottom-1 left-0 right-0 h-1 bg-[#C62828] rounded-full" /> */}
             </span>
           </h2>
           <p className="mt-5 text-gray-500 text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
