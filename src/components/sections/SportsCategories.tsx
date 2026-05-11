@@ -17,14 +17,14 @@ export interface SportCategory {
 const defaultCategories: SportCategory[] = [
   { icon: <SportIcon src="/images/svg/bat.png" alt="Cricket" />, title: "Cricket" },
   { icon: <SportIcon src="/images/svg/football.png" alt="Football" />, title: "Football" },
-  { icon: <SportIcon src="/images/svg/tennis.svg" alt="Tennis" />, title: "Tennis" },
+  { icon: <SportIcon src="/images/svg/tennis.png" alt="Tennis" />, title: "Tennis" },
   { icon: <SportIcon src="/images/svg/bedminton.png" alt="Badminton" />, title: "Badminton" },
-  { icon: <SportIcon src="/images/svg/tabletennis.svg" alt="Table Tennis" />, title: "Table Tennis" },
+  { icon: <SportIcon src="/images/svg/table-tennis.png" alt="Table Tennis" />, title: "Table Tennis" },
   { icon: <SportIcon src="/images/svg/swimming.png" alt="Swimming" />, title: "Swimming" },
   { icon: <SportIcon src="/images/svg/athletics.png" alt="Athletics" />, title: "Athletics" },
-  { icon: <SportIcon src="/images/svg/chess.svg" alt="Chess" />, title: "Chess" },
-  { icon: <SportIcon src="/images/svg/skating.svg" alt="Skating" />, title: "Skating" },
-  { icon: <SportIcon src="/images/svg/pickleball.svg" alt="Pickleball" />, title: "Pickleball" },
+  { icon: <SportIcon src="/images/svg/chess.png" alt="Chess" />, title: "Chess" },
+  { icon: <SportIcon src="/images/svg/skating.png" alt="Skating" />, title: "Skating" },
+  { icon: <SportIcon src="/images/svg/pickle.png" alt="Pickleball" />, title: "Pickleball" },
 ];
 
 interface SportsCategoriesProps {

@@ -37,7 +37,7 @@ export function AdminHeader({ onMenuToggle }: AdminHeaderProps) {
         </button>
         <div>
           <h1 className="text-base font-semibold text-[#0B1C2D]">{title}</h1>
-          <p className="text-[11px] text-gray-400">
+          <p className="text-[11px] text-gray-400" suppressHydrationWarning>
             {new Date().toLocaleDateString("en-IN", {
               weekday: "long",
               year: "numeric",

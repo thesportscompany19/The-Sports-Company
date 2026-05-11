@@ -19,6 +19,11 @@ import {
   PhoneCall,
   ArrowRight,
   X,
+  Gift,
+  Bell,
+  Zap,
+  Users,
+  Calendar,
 } from "lucide-react";
 
 interface KeyPoint {
@@ -33,40 +38,74 @@ const KEY_POINTS: KeyPoint[] = [
     title: "Registration Fee — ₹99 (One-Time)",
     desc: "A non-refundable fee of ₹99 activates your player profile and grants access to all events, matches & resources on the platform.",
   },
+  // {
+  //   icon: <UserCheck className="size-5" />,
+  //   title: "Identity & Age Verification",
+  //   desc: "Your Aadhaar number is used solely for age and identity verification. Participants must be 6+ years of age.",
+  // },
+  // {
+  //   icon: <Trophy className="size-5" />,
+  //   title: "Sport Participation & Fair Play",
+  //   desc: "You may register for multiple sports. The Sports Company reserves the right to disqualify players violating fair-play norms.",
+  // },
+  // {
+  //   icon: <HeartPulse className="size-5" />,
+  //   title: "Medical Fitness Declaration",
+  //   desc: "By proceeding, you confirm you are medically fit to participate. The platform is not liable for injuries during training or competition.",
+  // },
+  // {
+  //   icon: <Scale className="size-5" />,
+  //   title: "Code of Conduct",
+  //   desc: "All players, coaches, and guardians must maintain respectful conduct. Harassment or unsportsmanlike behaviour results in suspension.",
+  // },
+  // {
+  //   icon: <Lock className="size-5" />,
+  //   title: "Data Privacy & Security",
+  //   desc: "Your personal data is encrypted and never sold to third parties. It is used solely for registration, communication, and platform improvements.",
+  // },
+  // {
+  //   icon: <ShieldCheck className="size-5" />,
+  //   title: "Payment Security",
+  //   desc: "Payments are processed via Razorpay — a PCI-DSS certified gateway. We never store card or UPI details.",
+  // },
+  // {
+  //   icon: <PhoneCall className="size-5" />,
+  //   title: "Support & Grievance Redressal",
+  //   desc: "For payment or registration issues, email support@thesportscompany.in. Resolution within 3–5 business days.",
+  // },
+];
+
+interface RegistrationBenefit {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+}
+
+const REGISTRATION_BENEFITS: RegistrationBenefit[] = [
   {
-    icon: <UserCheck className="size-5" />,
-    title: "Identity & Age Verification",
-    desc: "Your Aadhaar number is used solely for age and identity verification. Participants must be 6+ years of age.",
+    icon: <Gift className="size-5" />,
+    title: "Monthly Sponsorship Draw",
+    desc: "One lucky registrant selected monthly to receive complimentary sports coaching fee coverage.",
   },
   {
-    icon: <Trophy className="size-5" />,
-    title: "Sport Participation & Fair Play",
-    desc: "You may register for multiple sports. The Sports Company reserves the right to disqualify players violating fair-play norms.",
+    icon: <Calendar className="size-5" />,
+    title: "Tournament Updates",
+    desc: "Stay informed about all forthcoming tournaments and events exclusively.",
   },
   {
-    icon: <HeartPulse className="size-5" />,
-    title: "Medical Fitness Declaration",
-    desc: "By proceeding, you confirm you are medically fit to participate. The platform is not liable for injuries during training or competition.",
+    icon: <Bell className="size-5" />,
+    title: "Sports News & Trends",
+    desc: "Receive regular updates on the latest sports news and industry trends.",
   },
   {
-    icon: <Scale className="size-5" />,
-    title: "Code of Conduct",
-    desc: "All players, coaches, and guardians must maintain respectful conduct. Harassment or unsportsmanlike behaviour results in suspension.",
+    icon: <Users className="size-5" />,
+    title: "Exclusive Seminars",
+    desc: "Get exclusive invitations to sports seminars and workshops by our organization.",
   },
   {
-    icon: <Lock className="size-5" />,
-    title: "Data Privacy & Security",
-    desc: "Your personal data is encrypted and never sold to third parties. It is used solely for registration, communication, and platform improvements.",
-  },
-  {
-    icon: <ShieldCheck className="size-5" />,
-    title: "Payment Security",
-    desc: "Payments are processed via Razorpay — a PCI-DSS certified gateway. We never store card or UPI details.",
-  },
-  {
-    icon: <PhoneCall className="size-5" />,
-    title: "Support & Grievance Redressal",
-    desc: "For payment or registration issues, email support@thesportscompany.in. Resolution within 3–5 business days.",
+    icon: <Zap className="size-5" />,
+    title: "1 Year Validity",
+    desc: "Enjoy all benefits for a full year from your registration date.",
   },
 ];
 
@@ -179,8 +218,48 @@ export function RegistrationTermsModal({
               </p>
             </div>
 
+            {/* Registration Benefits Section */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 px-1">
+                <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-[#C62828]/15 border border-[#C62828]/30">
+                  <Gift className="size-4 text-[#C62828]" />
+                </div>
+                <h3 className="text-lg font-bold text-[#0B1C2D]">₹99 Registration Benefits</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {REGISTRATION_BENEFITS.map((benefit, i) => (
+                  <div
+                    key={i}
+                    className="flex gap-3 p-4 rounded-xl border border-amber-100 bg-amber-50/50 hover:border-[#C62828]/30 hover:bg-red-50/30 transition-colors"
+                  >
+                    <div className="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg bg-[#C62828]/10 border border-[#C62828]/20 text-[#C62828] mt-0.5">
+                      {benefit.icon}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-[#0B1C2D] leading-snug">{benefit.title}</p>
+                      <p className="text-xs text-gray-600 mt-1 leading-relaxed">{benefit.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-[#C62828] font-medium italic px-1">
+                ✓ This registration is valid for 1 year from the date of registration
+              </p>
+            </div>
+
+            {/* Divider */}
+            <div className="h-px bg-gray-200" />
+
+            {/* Key Points Section Header */}
+            {/* <div className="flex items-center gap-2 px-1">
+              <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 border border-blue-200">
+                <ShieldCheck className="size-4 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-bold text-[#0B1C2D]">Terms & Key Points</h3>
+            </div> */}
+
             {/* Key points — 2-column grid on md+ */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {KEY_POINTS.map((point, i) => (
                 <div
                   key={i}
@@ -195,14 +274,14 @@ export function RegistrationTermsModal({
                   </div>
                 </div>
               ))}
-            </div>
+            </div> */}
 
             {/* Scroll hint */}
-            {!scrolled && (
+            {/* {!scrolled && (
               <p className="text-center text-xs text-gray-400 animate-pulse pb-1">
                 ↓ Scroll to review all points
               </p>
-            )}
+            )} */}
           </div>
         </div>
 
