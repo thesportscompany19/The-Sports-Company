@@ -64,10 +64,14 @@ function loadRazorpayScript(): Promise<boolean> {
 const SPORTS = [
   { name: "Cricket",     icon: "/images/svg/bat.png" },
   { name: "Football",    icon: "/images/svg/football.png" },
+  { name: "Tennis",      icon: "/images/svg/tennis.png" },
   { name: "Badminton",   icon: "/images/svg/bedminton.png" },
+  { name: "Table Tennis", icon: "/images/svg/table-tennis.png" },
   { name: "Swimming",    icon: "/images/svg/swimming.png" },
   { name: "Athletics",   icon: "/images/svg/athletics.png" },
-  { name: "Tennis",      icon: "/images/svg/ball.png" },
+  { name: "Chess",       icon: "/images/svg/chess.png" },
+  { name: "Skating",     icon: "/images/svg/skating.png" },
+  { name: "Pickleball",  icon: "/images/svg/pickle.png" },
 ];
 
 interface FormState {
@@ -79,6 +83,7 @@ interface FormState {
   email: string;
   city: string;
   aadhaar: string;
+  coachName: string;
 }
 
 interface PlayerRegistrationProps {
@@ -101,6 +106,7 @@ export function PlayerRegistration({
     email: "",
     city: "",
     aadhaar: "",
+    coachName: "",
   });
 
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
@@ -203,7 +209,7 @@ export function PlayerRegistration({
 
             if (verifyRes.ok && verifyData.success) {
               toast.success("Payment successful! Registration complete.");
-              setForm({ fullName: "", dob: "", gender: "", mobile: "", guardianMobile: "", email: "", city: "", aadhaar: "" });
+              setForm({ fullName: "", dob: "", gender: "", mobile: "", guardianMobile: "", email: "", city: "", aadhaar: "", coachName: "" });
               setSelectedSports([]);
               pendingPayloadRef.current = null;
             } else {
@@ -294,15 +300,21 @@ export function PlayerRegistration({
               </Select>
             </div>
 
-            <FormField
-              id="mobile"
-              label="Mobile Number"
-              type="tel"
-              placeholder="+91 00000 00000"
-              required
-              value={form.mobile}
-              onChange={handleChange("mobile")}
-            />
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="mobile" className="text-sm font-medium text-[#0B1C2D]">
+                Mobile Number <span className="text-[#C62828]">*</span>
+                <span className="ml-2 text-xs text-gray-600">(WhatsApp preferred)</span>
+              </Label>
+              <input
+                id="mobile"
+                type="tel"
+                placeholder="+91 00000 00000"
+                required
+                value={form.mobile}
+                onChange={handleChange("mobile")}
+                className="w-full h-12 border border-gray-300 rounded-lg bg-white text-sm text-[#0B1C2D] px-4 focus:outline-none focus:ring-2 focus:ring-[#C62828] focus:border-[#C62828] transition-all"
+              />
+            </div>
 
             <FormField
               id="guardianMobile"
@@ -340,6 +352,14 @@ export function PlayerRegistration({
               value={form.aadhaar}
               onChange={handleChange("aadhaar")}
             />
+
+            <FormField
+              id="coachName"
+              label="Coach Name"
+              placeholder="Enter coach name (optional)"
+              value={form.coachName}
+              onChange={handleChange("coachName")}
+            />
           </div>
 
           {/* ── Sport Selection ───────────────────────────────── */}
@@ -347,7 +367,7 @@ export function PlayerRegistration({
             Select Your Sport(s)
           </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-5 gap-4">
             {SPORTS.map((sport) => (
               <SportsSelectCard
                 key={sport.name}

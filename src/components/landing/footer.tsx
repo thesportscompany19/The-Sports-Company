@@ -53,9 +53,10 @@ export function Footer() {
             </div>
             <div>
               <h3 className="text-base font-extrabold text-white leading-tight">
-                The <span className="text-(--primary-color)">Sports Company</span>
+                The Sports Company
+                 {/* <span className="text-(--primary-color)">Sports Company</span> */}
               </h3>
-              <p className="text-white/60 text-[11px] uppercase tracking-wider mt-0.5">
+              <p className="text-(--primary-color) text-[10px] tracking-wider mt-0.5">
                 Your Complete Sports Ecosystem
               </p>
             </div>
