@@ -3,6 +3,7 @@ import { SportsCategories } from "@/components/sections/SportsCategories";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { EventsSection } from "@/components/sections/EventsSection";
 import { RecentResultsSection } from "@/components/sections/RecentResultsSection";
+import { TournamentResultsSection } from "@/components/sections/TournamentResultsSection";
 import { PlayerRegistration } from "@/components/sections/PlayerRegistration";
 import { CoachesSection } from "@/components/sections/CoachesSection";
 import { MatchSchedule } from "@/components/sections/MatchSchedule";
@@ -25,7 +26,8 @@ export default function Home() {
       <AboutSection />
       <SportsCategories />
       <EventsSection />
-      <RecentResultsSection />
+      <TournamentResultsSection />
+      {/* <RecentResultsSection /> */}
       <ImpactSection />
       <SponsorsSection />
       <CoachesSection />
