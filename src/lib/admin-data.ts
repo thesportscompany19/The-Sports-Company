@@ -104,17 +104,25 @@ export interface AdminMedia {
 
 function createStore<T extends { id: string }>(key: string, seed: T[]) {
   const STORAGE_KEY = `tida_admin_${key}`;
+  const VERSION_KEY = `tida_admin_${key}_v`;
+  const CURRENT_VERSION = 2; // Increment when seed data changes
 
   function load(): T[] {
     if (typeof window === "undefined") return seed;
     try {
+      const storedVersion = localStorage.getItem(VERSION_KEY);
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) {
+      
+      // If version mismatch or no data, use new seed
+      if (!stored || storedVersion !== String(CURRENT_VERSION)) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
+        localStorage.setItem(VERSION_KEY, String(CURRENT_VERSION));
         return seed;
       }
       return JSON.parse(stored) as T[];
     } catch {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
+      localStorage.setItem(VERSION_KEY, String(CURRENT_VERSION));
       return seed;
     }
   }
@@ -186,35 +194,35 @@ const SEED_COACHES: AdminCoach[] = [
 ];
 
 const SEED_PLAYERS: AdminPlayer[] = [
-  { id: "plr-1", name: "Diya Gupta", email: "rosybansal@gmail.com", phone: "+91 62395 38243", sport: "Table Tennis", gender: "Female", age: "12", registeredAt: "2026-04-10", status: "active" },
-  { id: "plr-2", name: "Ram Nath", email: "ramnath45@rediffmail.com", phone: "+91 78767 30764", sport: "Table Tennis", gender: "Male", age: "70", registeredAt: "2026-04-12", status: "active" },
-  { id: "plr-3", name: "Vikkhamjyot Kaur", email: "mpreetmaan@yahoo.co.in", phone: "+91 98050 98202", sport: "Table Tennis", gender: "Female", age: "14", registeredAt: "2026-04-15", status: "active" },
-  { id: "plr-4", name: "Manya", email: "paru.sally@gmail.com", phone: "+91 97804 70937", sport: "Table Tennis", gender: "Female", age: "14", registeredAt: "2026-04-18", status: "active" },
-  { id: "plr-5", name: "Anirudh Sally", email: "paru.sally@gmail.com", phone: "+91 97804 70937", sport: "Table Tennis", gender: "Male", age: "9", registeredAt: "2026-04-20", status: "active" },
-  { id: "plr-6", name: "Aarav Garg", email: "mukeshgarg1881@gmail.com", phone: "+91 94661 16346", sport: "Table Tennis", gender: "Male", age: "14", registeredAt: "2026-04-22", status: "active" },
-  { id: "plr-7", name: "Sameeksha Negi", email: "ravinder1110@gmail.com", phone: "+91 89681 08860", sport: "Table Tennis", gender: "Female", age: "14", registeredAt: "2026-04-25", status: "active" },
-  { id: "plr-8", name: "Sarbjit Singh", email: "sskyear4010@yahoo.com", phone: "+91 70095 47623", sport: "Table Tennis", gender: "Male", age: "65", registeredAt: "2026-05-01", status: "active" },
-  { id: "plr-9", name: "Nihar Saini", email: "nayarasaini19@gmail.com", phone: "+91 83077 32765", sport: "Table Tennis", gender: "Male", age: "13", registeredAt: "2026-05-02", status: "active" },
-  { id: "plr-10", name: "Athak", email: "rupk@aol.in", phone: "+91 85699 21821", sport: "Table Tennis", gender: "Male", age: "14", registeredAt: "2026-05-03", status: "active" },
-  { id: "plr-11", name: "Manreet Kaur", email: "manvinder.kamboj@gmail.com", phone: "+91 98880 36004", sport: "Table Tennis", gender: "Female", age: "15", registeredAt: "2026-05-04", status: "active" },
-  { id: "plr-12", name: "Satvik Sharma", email: "satviksharma7614@gmail.com", phone: "+91 94661 11701", sport: "Table Tennis", gender: "Male", age: "13", registeredAt: "2026-05-05", status: "active" },
-  { id: "plr-13", name: "Kartik Oberoi", email: "kamal143ob@gmail.com", phone: "+91 74048 59540", sport: "Table Tennis", gender: "Male", age: "14", registeredAt: "2026-05-06", status: "active" },
-  { id: "plr-14", name: "Prisha Gupta", email: "nitinenti123@gmail.com", phone: "+91 98763 27841", sport: "Table Tennis", gender: "Female", age: "13", registeredAt: "2026-05-07", status: "active" },
-  { id: "plr-15", name: "Dr O P Nagpal", email: "omjyoti2324@gmail.com", phone: "+91 98141 10415", sport: "Table Tennis", gender: "Male", age: "61", registeredAt: "2026-05-08", status: "active" },
-  { id: "plr-16", name: "Dipanshu Chandel", email: "vicky08081984@gmail.com", phone: "+91 78075 88267", sport: "Table Tennis", gender: "Male", age: "15", registeredAt: "2026-05-09", status: "active" },
-  { id: "plr-17", name: "Naman Kumar", email: "namank1506@gmail.com", phone: "+91 82955 50577", sport: "Table Tennis", gender: "Male", age: "19", registeredAt: "2026-05-09", status: "active" },
-  { id: "plr-18", name: "Ahaana Vats", email: "jyotisharma82@gmail.com", phone: "+91 82830 86210", sport: "Table Tennis", gender: "Female", age: "9", registeredAt: "2026-05-10", status: "active" },
-  { id: "plr-19", name: "Prabhveer Singh", email: "prabhveer.virk@email.com", phone: "+91 77194 82829", sport: "Table Tennis", gender: "Male", age: "17", registeredAt: "2026-05-10", status: "active" },
-  { id: "plr-20", name: "Ruhaan Saini", email: "ravish.digitalmarketing@gmail.com", phone: "+91 98888 99903", sport: "Table Tennis", gender: "Male", age: "9", registeredAt: "2026-05-10", status: "active" },
-  { id: "plr-21", name: "Khwahish", email: "kchanchan486@yahoo.co.in", phone: "+91 99880 72486", sport: "Table Tennis", gender: "Female", age: "14", registeredAt: "2026-05-10", status: "active" },
-  { id: "plr-22", name: "Namish", email: "nikshep889@gmail.com", phone: "+91 99143 84654", sport: "Table Tennis", gender: "Male", age: "13", registeredAt: "2026-05-10", status: "active" },
-  { id: "plr-23", name: "Rani", email: "goswamirani148@gmail.com", phone: "+91 83074 00589", sport: "Table Tennis", gender: "Female", age: "24", registeredAt: "2026-05-11", status: "active" },
-  { id: "plr-24", name: "Yatharth", email: "shikharao@gmail.com", phone: "+91 88725 95736", sport: "Table Tennis", gender: "Male", age: "8", registeredAt: "2026-05-11", status: "active" },
-  { id: "plr-25", name: "Abhijit Singh", email: "amarjit27singh@gmail.com", phone: "+91 70095 38056", sport: "Table Tennis", gender: "Male", age: "15", registeredAt: "2026-05-11", status: "active" },
-  { id: "plr-26", name: "Saksham Goyal", email: "sakshamgoyal2400@gmail.com", phone: "+91 90232 90264", sport: "Table Tennis", gender: "Male", age: "13", registeredAt: "2026-05-11", status: "active" },
-  { id: "plr-27", name: "Mehak", email: "arunkumarngh@gmail.com", phone: "+91 94682 92444", sport: "Table Tennis", gender: "Female", age: "12", registeredAt: "2026-05-11", status: "active" },
-  { id: "plr-28", name: "Hetaksh Goyal", email: "amitgoyal0007@yahoo.co.in", phone: "+91 98789 40007", sport: "Table Tennis", gender: "Male", age: "9", registeredAt: "2026-05-11", status: "active" },
-  { id: "plr-29", name: "Lavish", email: "ajaybakshi569@gmail.com", phone: "+91 97291 20601", sport: "Table Tennis", gender: "Male", age: "13", registeredAt: "2026-05-11", status: "active" },
+  { id: "plr-1", name: "Diya Gupta", email: "rosybansal@gmail.com", phone: "+91 62395 38243", sport: "Table Tennis", gender: "Female", age: "12", registeredAt: "2026-05-01", status: "active" },
+  { id: "plr-2", name: "Ram Nath", email: "ramnath45@rediffmail.com", phone: "+91 78767 30764", sport: "Table Tennis", gender: "Male", age: "70", registeredAt: "2026-05-02", status: "active" },
+  { id: "plr-3", name: "Vikkhamjyot Kaur", email: "mpreetmaan@yahoo.co.in", phone: "+91 98050 98202", sport: "Table Tennis", gender: "Female", age: "14", registeredAt: "2026-05-03", status: "active" },
+  { id: "plr-4", name: "Manya", email: "paru.sally@gmail.com", phone: "+91 97804 70937", sport: "Table Tennis", gender: "Female", age: "14", registeredAt: "2026-05-04", status: "active" },
+  { id: "plr-5", name: "Anirudh Sally", email: "paru.sally@gmail.com", phone: "+91 97804 70937", sport: "Table Tennis", gender: "Male", age: "9", registeredAt: "2026-05-05", status: "active" },
+  { id: "plr-6", name: "Aarav Garg", email: "mukeshgarg1881@gmail.com", phone: "+91 94661 16346", sport: "Table Tennis", gender: "Male", age: "14", registeredAt: "2026-05-06", status: "active" },
+  { id: "plr-7", name: "Sameeksha Negi", email: "ravinder1110@gmail.com", phone: "+91 89681 08860", sport: "Table Tennis", gender: "Female", age: "14", registeredAt: "2026-05-07", status: "active" },
+  { id: "plr-8", name: "Sarbjit Singh", email: "sskyear4010@yahoo.com", phone: "+91 70095 47623", sport: "Table Tennis", gender: "Male", age: "65", registeredAt: "2026-05-08", status: "active" },
+  { id: "plr-9", name: "Nihar Saini", email: "nayarasaini19@gmail.com", phone: "+91 83077 32765", sport: "Table Tennis", gender: "Male", age: "13", registeredAt: "2026-05-09", status: "active" },
+  { id: "plr-10", name: "Athak", email: "rupk@aol.in", phone: "+91 85699 21821", sport: "Table Tennis", gender: "Male", age: "14", registeredAt: "2026-05-10", status: "active" },
+  { id: "plr-11", name: "Manreet Kaur", email: "manvinder.kamboj@gmail.com", phone: "+91 98880 36004", sport: "Table Tennis", gender: "Female", age: "15", registeredAt: "2026-05-11", status: "active" },
+  { id: "plr-12", name: "Satvik Sharma", email: "satviksharma7614@gmail.com", phone: "+91 94661 11701", sport: "Table Tennis", gender: "Male", age: "13", registeredAt: "2026-05-12", status: "active" },
+  { id: "plr-13", name: "Kartik Oberoi", email: "kamal143ob@gmail.com", phone: "+91 74048 59540", sport: "Table Tennis", gender: "Male", age: "14", registeredAt: "2026-05-13", status: "active" },
+  { id: "plr-14", name: "Prisha Gupta", email: "nitinenti123@gmail.com", phone: "+91 98763 27841", sport: "Table Tennis", gender: "Female", age: "13", registeredAt: "2026-05-14", status: "active" },
+  { id: "plr-15", name: "Dr O P Nagpal", email: "omjyoti2324@gmail.com", phone: "+91 98141 10415", sport: "Table Tennis", gender: "Male", age: "61", registeredAt: "2026-05-15", status: "active" },
+  { id: "plr-16", name: "Dipanshu Chandel", email: "vicky08081984@gmail.com", phone: "+91 78075 88267", sport: "Table Tennis", gender: "Male", age: "15", registeredAt: "2026-05-16", status: "active" },
+  { id: "plr-17", name: "Naman Kumar", email: "namank1506@gmail.com", phone: "+91 82955 50577", sport: "Table Tennis", gender: "Male", age: "19", registeredAt: "2026-05-16", status: "active" },
+  { id: "plr-18", name: "Ahaana Vats", email: "jyotisharma82@gmail.com", phone: "+91 82830 86210", sport: "Table Tennis", gender: "Female", age: "9", registeredAt: "2026-05-17", status: "active" },
+  { id: "plr-19", name: "Prabhveer Singh", email: "prabhveer.virk@email.com", phone: "+91 77194 82829", sport: "Table Tennis", gender: "Male", age: "17", registeredAt: "2026-05-17", status: "active" },
+  { id: "plr-20", name: "Ruhaan Saini", email: "ravish.digitalmarketing@gmail.com", phone: "+91 98888 99903", sport: "Table Tennis", gender: "Male", age: "8", registeredAt: "2026-05-17", status: "active" },
+  { id: "plr-21", name: "Khwahish", email: "kchanchan486@yahoo.co.in", phone: "+91 99880 72486", sport: "Table Tennis", gender: "Female", age: "14", registeredAt: "2026-05-17", status: "active" },
+  { id: "plr-22", name: "Namish", email: "nikshep889@gmail.com", phone: "+91 99143 84654", sport: "Table Tennis", gender: "Male", age: "13", registeredAt: "2026-05-17", status: "active" },
+  { id: "plr-23", name: "Rani", email: "goswamirani148@gmail.com", phone: "+91 83074 00589", sport: "Table Tennis", gender: "Female", age: "24", registeredAt: "2026-05-18", status: "active" },
+  { id: "plr-24", name: "Yatharth", email: "shikharao@gmail.com", phone: "+91 88725 95736", sport: "Table Tennis", gender: "Male", age: "8", registeredAt: "2026-05-18", status: "active" },
+  { id: "plr-25", name: "Abhijit Singh", email: "amarjit27singh@gmail.com", phone: "+91 70095 38056", sport: "Table Tennis", gender: "Male", age: "15", registeredAt: "2026-05-18", status: "active" },
+  { id: "plr-26", name: "Saksham Goyal", email: "sakshamgoyal2400@gmail.com", phone: "+91 90232 90264", sport: "Table Tennis", gender: "Male", age: "13", registeredAt: "2026-05-18", status: "active" },
+  { id: "plr-27", name: "Mehak", email: "arunkumarngh@gmail.com", phone: "+91 94682 92444", sport: "Table Tennis", gender: "Female", age: "12", registeredAt: "2026-05-18", status: "active" },
+  { id: "plr-28", name: "Hetaksh Goyal", email: "amitgoyal0007@yahoo.co.in", phone: "+91 98789 40007", sport: "Table Tennis", gender: "Male", age: "9", registeredAt: "2026-05-18", status: "active" },
+  { id: "plr-29", name: "Lavish", email: "ajaybakshi569@gmail.com", phone: "+91 97291 20601", sport: "Table Tennis", gender: "Male", age: "13", registeredAt: "2026-05-18", status: "active" },
 ];
 
 const SEED_RESULTS: AdminResult[] = [

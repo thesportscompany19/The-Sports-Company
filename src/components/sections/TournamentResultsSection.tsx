@@ -287,7 +287,7 @@ export function TournamentResultsSection() {
               <p className="text-xs text-gray-500 mt-1">Gold Medalists</p>
             </div>
             <div className="bg-linear-to-br from-purple-50 to-purple-100 rounded-lg p-6 text-center hover:shadow-lg transition-all">
-              <p className="text-3xl font-bold text-[#C62828]">100+</p>
+              <p className="text-3xl font-bold text-[#C62828]">300</p>
               <p className="text-sm text-gray-600 mt-2 font-semibold">Participants</p>
               <p className="text-xs text-gray-500 mt-1">From Chandigarh</p>
             </div>

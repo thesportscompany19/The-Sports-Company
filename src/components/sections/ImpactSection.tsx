@@ -12,19 +12,19 @@ interface StatItem {
 const STATS: StatItem[] = [
   {
     icon: <Trophy className="size-7 text-white" />,
-    number: "1,200+",
+    number: "50+",
     title: "Events Hosted",
     description: "Tournaments and matches organised across India every year",
   },
   {
     icon: <Users className="size-7 text-white" />,
-    number: "50,000+",
+    number: "1000+",
     title: "Registered Players",
     description: "Athletes across 10+ sports categories competing on our platform",
   },
   {
     icon: <IndianRupee className="size-7 text-white" />,
-    number: "₹2 Cr+",
+    number: "₹2 lakh+",
     title: "Prize Money Distributed",
     description: "Total prize pool awarded to winners and runners-up annually",
   },

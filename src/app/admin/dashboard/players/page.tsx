@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Plus, Search, Edit2, Trash2, RotateCcw } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, RotateCcw, User, Mail, Phone, Calendar, Trophy, Users, CheckCircle2, Clock, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { Input } from "@/components/ui/input";
@@ -37,6 +37,7 @@ function FieldError({ msg }: { msg?: string }) {
 export default function PlayersPage() {
   const { loading } = useAdminAuth();
   const [items, setItems] = useState<AdminPlayer[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [search, setSearch] = useState("");
   const [sportFilter, setSportFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -47,7 +48,10 @@ export default function PlayersPage() {
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  useEffect(() => { setItems(playersStore.getAll()); }, []);
+  useEffect(() => {
+    setIsHydrated(true);
+    setItems(playersStore.getAll());
+  }, []);
 
   const filtered = useMemo(() => items.filter((item) => {
     const q = search.toLowerCase();
@@ -98,55 +102,125 @@ export default function PlayersPage() {
 
   const columns: TableColumn<AdminPlayer>[] = [
     {
-      key: "#", label: "#", headerClassName: "text-left w-10",
-      render: (_, idx) => <span className="text-gray-400 text-xs">{idx}</span>,
+      key: "index", label: "#", headerClassName: "text-left w-12",
+      render: (_, idx) => <span className="font-medium text-gray-500 text-xs">{String(idx + 1).padStart(2, "0")}</span>,
     },
     {
-      key: "name", label: "Name", sortable: true, getValue: (item) => item.name,
-      render: (item) => <span className="font-medium text-[#0B1C2D] whitespace-nowrap">{item.name}</span>,
-    },
-    {
-      key: "email", label: "Email", sortable: true, getValue: (item) => item.email,
-      render: (item) => <span className="text-gray-600">{item.email}</span>,
-    },
-    {
-      key: "phone", label: "Phone",
-      render: (item) => <span className="text-gray-600 whitespace-nowrap">{item.phone}</span>,
-    },
-    {
-      key: "sport", label: "Sport", sortable: true, getValue: (item) => item.sport,
-      render: (item) => <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#0B1C2D]/8 text-[#0B1C2D]">{item.sport}</span>,
-    },
-    {
-      key: "gender", label: "Gender", sortable: true, getValue: (item) => item.gender,
-      render: (item) => <span className="text-gray-600">{item.gender}</span>,
-    },
-    {
-      key: "age", label: "Age", sortable: true, getValue: (item) => Number(item.age) || 0,
-      render: (item) => <span className="text-gray-600">{item.age}</span>,
-    },
-    {
-      key: "registeredAt", label: "Registered", sortable: true, getValue: (item) => item.registeredAt,
-      render: (item) => <span className="text-gray-500 whitespace-nowrap text-xs">{item.registeredAt}</span>,
-    },
-    {
-      key: "status", label: "Status", sortable: true, getValue: (item) => item.status,
+      key: "id", label: "Player ID", sortable: true, getValue: (item) => item.id,
       render: (item) => (
-        <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium border capitalize", STATUS_STYLE[item.status])}>{item.status}</span>
+        <span className="font-mono text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border">
+          {item.id}
+        </span>
       ),
     },
     {
-      key: "actions", label: "Actions", headerClassName: "text-right", className: "text-right",
+      key: "name", label: "Player Name", sortable: true, getValue: (item) => item.name,
       render: (item) => (
-        <div className="flex items-center justify-end gap-1">
-          <button onClick={() => openEdit(item)} className="p-1.5 rounded-md hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-colors" title="Edit"><Edit2 className="size-3.5" /></button>
-          <button onClick={() => setDeleteId(item.id)} className="p-1.5 rounded-md hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors" title="Delete"><Trash2 className="size-3.5" /></button>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-[#C62828]/15 border border-[#C62828]/20 flex items-center justify-center">
+            <User className="size-4 text-[#C62828]" />
+          </div>
+          <span className="font-semibold text-[#0B1C2D]">{item.name}</span>
+        </div>
+      ),
+    },
+    {
+      key: "email", label: "Email Address", sortable: true, getValue: (item) => item.email,
+      render: (item) => (
+        <div className="flex items-center gap-2 text-sm">
+          <Mail className="size-3.5 text-gray-400" />
+          <span className="text-gray-600">{item.email}</span>
+        </div>
+      ),
+    },
+    {
+      key: "phone", label: "Contact Number", sortable: false,
+      render: (item) => (
+        <div className="flex items-center gap-2 text-sm">
+          <Phone className="size-3.5 text-gray-400" />
+          <span className="text-gray-600 font-mono">{item.phone}</span>
+        </div>
+      ),
+    },
+    {
+      key: "gender", label: "Gender", sortable: true, getValue: (item) => item.gender,
+      render: (item) => (
+        <div className="flex items-center gap-2">
+          <Users className="size-3.5 text-gray-400" />
+          <span className="text-sm text-gray-600">{item.gender}</span>
+        </div>
+      ),
+    },
+    {
+      key: "age", label: "Age", sortable: true, getValue: (item) => Number(item.age) || 0,
+      render: (item) => (
+        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
+          {item.age}
+        </span>
+      ),
+    },
+    {
+      key: "sport", label: "Sport", sortable: true, getValue: (item) => item.sport,
+      render: (item) => (
+        <div className="flex items-center gap-2">
+          <Trophy className="size-3.5 text-amber-500" />
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+            {item.sport}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: "registeredAt", label: "Registration Date", sortable: true, getValue: (item) => item.registeredAt,
+      render: (item) => (
+        <div className="flex items-center gap-2 text-sm">
+          <Calendar className="size-3.5 text-gray-400" />
+          <span className="text-gray-600">{new Date(item.registeredAt).toLocaleDateString("en-IN")}</span>
+        </div>
+      ),
+    },
+    {
+      key: "status", label: "Status", sortable: true, getValue: (item) => item.status,
+      render: (item) => {
+        const icons = {
+          active: <CheckCircle2 className="size-3.5" />,
+          pending: <Clock className="size-3.5" />,
+          inactive: <XCircle className="size-3.5" />,
+        };
+        return (
+          <div className="flex items-center gap-1.5">
+            <span className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border capitalize", STATUS_STYLE[item.status])}>
+              {icons[item.status]}
+              {item.status}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      key: "actions", label: "Actions", headerClassName: "text-center", className: "text-center",
+      render: (item) => (
+        <div className="flex items-center justify-center gap-1">
+          <button
+            onClick={() => openEdit(item)}
+            className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-all hover:shadow-sm"
+            title="Edit Player"
+          >
+            <Edit2 className="size-4" />
+          </button>
+          <button
+            onClick={() => setDeleteId(item.id)}
+            className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-all hover:shadow-sm"
+            title="Delete Player"
+          >
+            <Trash2 className="size-4" />
+          </button>
         </div>
       ),
     },
   ];
 
-  if (loading) return (
+  if (loading || !isHydrated) return (
     <div className="flex items-center justify-center min-h-[60vh]">
       <span className="size-8 border-2 border-[#C62828]/30 border-t-[#C62828] rounded-full animate-spin" />
     </div>
