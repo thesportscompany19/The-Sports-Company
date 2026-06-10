@@ -166,7 +166,7 @@ export default function AdminLoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@tidasports.com"
+                  placeholder="admin@thesports.com"
                   autoComplete="email"
                   className={cn(
                     "w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-all",
@@ -237,7 +237,7 @@ export default function AdminLoginPage() {
               <div className="bg-gray-50 rounded-lg px-4 py-3 font-mono text-xs text-gray-600 space-y-1">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Email</span>
-                  <span className="font-medium">admin@tidasports.com</span>
+                  <span className="font-medium">admin@thesports.com</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Password</span>

@@ -1,9 +1,9 @@
 // Admin authentication utilities
 
-const AUTH_KEY = "tida_admin_auth";
+const AUTH_KEY = "thesports_admin_auth";
 
 export const ADMIN_CREDENTIALS = {
-  email: "admin@tidasports.com",
+  email: "admin@thesports.com",
   password: "Admin@2026",
 };
 export interface AdminSession {

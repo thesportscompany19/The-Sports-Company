@@ -29,7 +29,7 @@ interface AdminEvent {
   createdAt: string;
 }
 
-const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball"];
+const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball", "Chess"];
 const STATUSES: EventStatus[] = ["upcoming", "ongoing", "completed", "cancelled"];
 
 const STATUS_STYLE: Record<EventStatus, string> = {

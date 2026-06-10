@@ -14,7 +14,7 @@ import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { mediaStore, type AdminMedia, type MediaType } from "@/lib/admin-data";
 import { cn } from "@/lib/utils";
 
-const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Event"];
+const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Event", "Chess"];
 
 type FormData = Omit<AdminMedia, "id">;
 

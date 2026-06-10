@@ -14,7 +14,7 @@ import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { playersStore, type AdminPlayer, type PlayerStatus } from "@/lib/admin-data";
 import { cn } from "@/lib/utils";
 
-const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball"];
+const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball", "Chess"];
 const STATUSES: PlayerStatus[] = ["active", "pending", "inactive"];
 
 const STATUS_STYLE: Record<PlayerStatus, string> = {

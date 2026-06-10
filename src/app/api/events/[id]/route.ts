@@ -5,7 +5,7 @@ import { Event } from "@/models/Event";
 
 const VALID_SPORTS = [
   "Cricket", "Football", "Badminton", "Basketball",
-  "Tennis", "Athletics", "Hockey", "Volleyball",
+  "Tennis", "Athletics", "Hockey", "Volleyball", "Chess",
 ];
 const VALID_STATUSES = ["upcoming", "ongoing", "completed", "cancelled"];
 

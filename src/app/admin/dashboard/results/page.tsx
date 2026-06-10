@@ -14,7 +14,7 @@ import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { resultsStore, type AdminResult } from "@/lib/admin-data";
 import { cn } from "@/lib/utils";
 
-const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball"];
+const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball", "Chess"];
 
 type FormData = Omit<AdminResult, "id">;
 

@@ -14,7 +14,7 @@ import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { matchesStore, type AdminMatch, type MatchStatus } from "@/lib/admin-data";
 import { cn } from "@/lib/utils";
 
-const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball"];
+const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball", "Chess"];
 const ROUNDS = ["Group Stage", "Round of 16", "Quarter Final", "Semi Final", "Final", "Finals"];
 const STATUS_STYLE: Record<MatchStatus, string> = {
   upcoming: "bg-blue-50 text-blue-700 border-blue-200",
