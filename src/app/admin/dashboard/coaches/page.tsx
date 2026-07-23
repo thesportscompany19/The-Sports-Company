@@ -75,12 +75,16 @@ export default function CoachesPage() {
   function handleSave() {
     if (!validate()) return;
     if (editId) { coachesStore.update(editId, form); } else { coachesStore.add(form); }
-    reload(); setShowModal(false);
+    reload();
+    try { localStorage.setItem("tida_admin_coaches_update", String(Date.now())); } catch {}
+    setShowModal(false);
   }
 
   function handleDelete() {
     if (!deleteId) return;
-    coachesStore.remove(deleteId); reload(); setDeleteId(null);
+    coachesStore.remove(deleteId); reload();
+    try { localStorage.setItem("tida_admin_coaches_update", String(Date.now())); } catch {}
+    setDeleteId(null);
   }
 
   const columns: TableColumn<AdminCoach>[] = [
