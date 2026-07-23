@@ -12,6 +12,7 @@ import { AdminModal } from "@/components/admin/AdminModal";
 import { DataTable, type TableColumn } from "@/components/admin/DataTable";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { coachesStore, type AdminCoach } from "@/lib/admin-data";
+import { getCoachImageBySport } from "@/lib/coach-images";
 import { cn } from "@/lib/utils";
 
 const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball", "Chess"];
@@ -74,7 +75,8 @@ export default function CoachesPage() {
 
   function handleSave() {
     if (!validate()) return;
-    if (editId) { coachesStore.update(editId, form); } else { coachesStore.add(form); }
+    const payload = { ...form, image: getCoachImageBySport(form.sport) };
+    if (editId) { coachesStore.update(editId, payload); } else { coachesStore.add(payload); }
     reload();
     try { localStorage.setItem("tida_admin_coaches_update", String(Date.now())); } catch {}
     setShowModal(false);

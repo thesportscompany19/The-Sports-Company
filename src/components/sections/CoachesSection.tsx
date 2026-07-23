@@ -4,16 +4,17 @@ import { useEffect, useState } from "react";
 import { SectionWrapper } from "@/components/common/SectionWrapper";
 import { CoachCard, type CoachCardProps } from "@/components/cards/CoachCard";
 import { coachesStore } from "@/lib/admin-data";
+import { getCoachImageBySport } from "@/lib/coach-images";
 
 export type CoachData = Omit<CoachCardProps, "onContact" | "className">;
 
 const defaultCoaches: CoachData[] = [
-  { image: "/images/event-1.png", name: "Ravi Shastri", sport: "Cricket", academy: "National Cricket Academy", location: "Mumbai, Maharashtra", specialization: "Batting", experience: "15 Years", fee: "₹2,500 / Session" },
-  { image: "/images/event-2.png", name: "Sunil Chhetri", sport: "Football", academy: "Elite Football Academy", location: "Bengaluru, Karnataka", specialization: "Attacking Play", experience: "12 Years", fee: "₹2,000 / Session" },
-  { image: "/images/event-3.png", name: "Saina Nehwal", sport: "Badminton", academy: "Gopichand Badminton Academy", location: "Hyderabad, Telangana", specialization: "Singles", experience: "18 Years", fee: "₹3,000 / Session" },
-  { image: "/images/event-4.png", name: "Milkha Singh", sport: "Athletics", academy: "SAI Athletics Centre", location: "Patiala, Punjab", specialization: "Sprinting", experience: "20 Years", fee: "₹1,800 / Session" },
-  { image: "/images/event-1.png", name: "Satpal Singh", sport: "Wrestling", academy: "Haryana Sports Academy", location: "Sonipat, Haryana", specialization: "Freestyle", experience: "22 Years", fee: "₹1,500 / Session" },
-  { image: "/images/event-2.png", name: "Pullela Gopichand", sport: "Badminton", academy: "Gopichand Academy", location: "Hyderabad, Telangana", specialization: "Doubles & Singles", experience: "25 Years", fee: "₹3,500 / Session" },
+  { image: getCoachImageBySport("Cricket"), name: "Ravi Shastri", sport: "Cricket", academy: "National Cricket Academy", location: "Mumbai, Maharashtra", specialization: "Batting", experience: "15 Years", fee: "₹2,500 / Session" },
+  { image: getCoachImageBySport("Football"), name: "Sunil Chhetri", sport: "Football", academy: "Elite Football Academy", location: "Bengaluru, Karnataka", specialization: "Attacking Play", experience: "12 Years", fee: "₹2,000 / Session" },
+  { image: getCoachImageBySport("Badminton"), name: "Saina Nehwal", sport: "Badminton", academy: "Gopichand Badminton Academy", location: "Hyderabad, Telangana", specialization: "Singles", experience: "18 Years", fee: "₹3,000 / Session" },
+  { image: getCoachImageBySport("Athletics"), name: "Milkha Singh", sport: "Athletics", academy: "SAI Athletics Centre", location: "Patiala, Punjab", specialization: "Sprinting", experience: "20 Years", fee: "₹1,800 / Session" },
+  { image: getCoachImageBySport("Wrestling"), name: "Satpal Singh", sport: "Wrestling", academy: "Haryana Sports Academy", location: "Sonipat, Haryana", specialization: "Freestyle", experience: "22 Years", fee: "₹1,500 / Session" },
+  { image: getCoachImageBySport("Badminton"), name: "Pullela Gopichand", sport: "Badminton", academy: "Gopichand Academy", location: "Hyderabad, Telangana", specialization: "Doubles & Singles", experience: "25 Years", fee: "₹3,500 / Session" },
 ];
 
 interface CoachesSectionProps {
@@ -32,7 +33,7 @@ export function CoachesSection({
   const [coaches, setCoaches] = useState<CoachData[]>(() => {
     try {
       const list = coachesStore.getAll();
-      return list.map((c) => ({ image: c.image, name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee }));
+      return list.map((c) => ({ image: getCoachImageBySport(c.sport), name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee }));
     } catch {
       return defaultCoaches;
     }
@@ -51,7 +52,7 @@ export function CoachesSection({
         const data = await res.json();
         if (!mounted) return;
         if (data?.success && Array.isArray(data.coaches)) {
-          setCoaches(data.coaches.map((c: any) => ({ image: c.image, name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee })));
+          setCoaches(data.coaches.map((c: any) => ({ image: getCoachImageBySport(c.sport), name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee })));
           return;
         }
       } catch (err) {
@@ -61,7 +62,7 @@ export function CoachesSection({
       // fallback to local admin store
       try {
         const list = coachesStore.getAll();
-        if (mounted) setCoaches(list.map((c) => ({ image: c.image, name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee })));
+        if (mounted) setCoaches(list.map((c) => ({ image: getCoachImageBySport(c.sport), name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee })));
       } catch (e) {
         // keep defaults
       }
