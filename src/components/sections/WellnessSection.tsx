@@ -1,11 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { SectionWrapper } from "@/components/common/SectionWrapper";
 import { CustomTabs } from "@/components/common/CustomTabs";
 import { WellnessCard, type WellnessCardProps } from "@/components/cards/WellnessCard";
+import { WellnessBookingModal } from "@/components/form/WellnessBookingModal";
 import { Brain, Heart, Dumbbell } from "lucide-react";
 
-type WellnessData = Omit<WellnessCardProps, "onBook" | "className">;
+type WellnessType = "psychologists" | "counselors" | "gyms";
+
+type WellnessData = Omit<WellnessCardProps, "onBook" | "className"> & { type: WellnessType };
 
 const PSYCHOLOGISTS: WellnessData[] = [
   {
@@ -16,6 +20,8 @@ const PSYCHOLOGISTS: WellnessData[] = [
     experience: "12 years experience",
     sessionLabel: "Per Session",
     fee: "₹1,200",
+    amount: 1200,
+    type: "psychologists",
   },
   {
     image: "/images/Image%20(Dr.%20Karthik%20Reddy).png",
@@ -25,6 +31,8 @@ const PSYCHOLOGISTS: WellnessData[] = [
     experience: "9 years experience",
     sessionLabel: "Per Session",
     fee: "₹1,500",
+    amount: 1500,
+    type: "psychologists",
   },
   {
     image: "/images/result-1.png",
@@ -34,6 +42,8 @@ const PSYCHOLOGISTS: WellnessData[] = [
     experience: "7 years experience",
     sessionLabel: "Per Session",
     fee: "₹1,000",
+    amount: 1000,
+    type: "psychologists",
   },
 ];
 
@@ -46,6 +56,8 @@ const COUNSELORS: WellnessData[] = [
     experience: "8 years experience",
     sessionLabel: "Per Session",
     fee: "₹800",
+    amount: 800,
+    type: "counselors",
   },
   {
     image: "/images/Image%20(Dr.%20Anjali%20Mehta).png",
@@ -55,6 +67,8 @@ const COUNSELORS: WellnessData[] = [
     experience: "6 years experience",
     sessionLabel: "Per Session",
     fee: "₹750",
+    amount: 750,
+    type: "counselors",
   },
   {
     image: "/images/result-1.png",
@@ -64,6 +78,8 @@ const COUNSELORS: WellnessData[] = [
     experience: "5 years experience",
     sessionLabel: "Per Session",
     fee: "₹700",
+    amount: 700,
+    type: "counselors",
   },
 ];
 
@@ -76,6 +92,8 @@ const GYMS: WellnessData[] = [
     experience: "Equipment for 20+ sports",
     sessionLabel: "Monthly",
     fee: "₹2,500",
+    amount: 2500,
+    type: "gyms",
   },
   {
     image: "/images/event-2.png",
@@ -85,6 +103,8 @@ const GYMS: WellnessData[] = [
     experience: "NSCA-certified trainers",
     sessionLabel: "Monthly",
     fee: "₹3,000",
+    amount: 3000,
+    type: "gyms",
   },
   {
     image: "/images/event-3.png",
@@ -94,6 +114,8 @@ const GYMS: WellnessData[] = [
     experience: "Olympic-standard equipment",
     sessionLabel: "Monthly",
     fee: "₹2,200",
+    amount: 2200,
+    type: "gyms",
   },
 ];
 
@@ -112,29 +134,42 @@ const WELLNESS_TABS = [
 interface WellnessSectionProps {
   title?: string;
   subtitle?: string;
-  onBook?: (item: WellnessData) => void;
 }
 
 export function WellnessSection({
   title = "Wellness & Fitness",
   subtitle = "Connect with certified professionals to support your athletic journey",
-  onBook,
 }: WellnessSectionProps) {
+  const [activeItem, setActiveItem] = useState<WellnessData | null>(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+
+  const handleBook = (item: WellnessData) => {
+    setActiveItem(item);
+    setShowBookingModal(true);
+  };
+
   return (
     <SectionWrapper id="wellness" title={title} subtitle={subtitle}>
-      <CustomTabs tabs={WELLNESS_TABS} variant="dark" centered>
+      <CustomTabs tabs={WELLNESS_TABS} variant="dark" centered scrollable>
         {(activeTab) => (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             {DATA_MAP[activeTab].map((item) => (
               <WellnessCard
                 key={item.name}
                 {...item}
-                onBook={() => onBook?.(item)}
+                onBook={() => handleBook(item)}
               />
             ))}
           </div>
         )}
       </CustomTabs>
+
+      <WellnessBookingModal
+        open={showBookingModal}
+        item={activeItem}
+        onClose={() => setShowBookingModal(false)}
+        onSuccess={() => setShowBookingModal(false)}
+      />
     </SectionWrapper>
   );
 }

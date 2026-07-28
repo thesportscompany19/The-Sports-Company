@@ -5,6 +5,8 @@ import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+export type WellnessType = "psychologists" | "counselors" | "gyms";
+
 export interface WellnessCardProps {
   image: string;
   name: string;
@@ -13,6 +15,8 @@ export interface WellnessCardProps {
   experience: string;
   sessionLabel: string;
   fee: string;
+  amount: number;
+  type?: WellnessType;
   onBook?: () => void;
   className?: string;
 }
