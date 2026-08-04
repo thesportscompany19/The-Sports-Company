@@ -15,6 +15,7 @@ export interface CoachCardProps {
   specialization: string;
   experience: string;
   fee: string;
+  discountLabel?: string;
   onContact?: () => void;
   className?: string;
 }
@@ -28,6 +29,7 @@ export function CoachCard({
   specialization,
   experience,
   fee,
+  discountLabel,
   onContact,
   className,
 }: CoachCardProps) {
@@ -55,6 +57,12 @@ export function CoachCard({
           <span>{location}</span>
         </div>
 
+        {discountLabel ? (
+          <Badge className="mt-3 self-start rounded-full bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9] px-3 py-1 text-xs font-semibold">
+            {discountLabel}
+          </Badge>
+        ) : null}
+
         {/* Info boxes */}
         <div className="grid grid-cols-2 gap-2 mt-3">
           <div className="bg-gray-100 rounded-md p-2">
@@ -77,7 +85,7 @@ export function CoachCard({
           onClick={onContact}
           className="w-full py-2 rounded-md mt-3 cursor-pointer"
         >
-          Contact Coach
+          Book Now
         </PrimaryButton>
       </div>
     </div>

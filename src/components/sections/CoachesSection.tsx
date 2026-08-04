@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { SectionWrapper } from "@/components/common/SectionWrapper";
 import { CoachCard, type CoachCardProps } from "@/components/cards/CoachCard";
+import { BookingModal, type BookingItem } from "@/components/form/BookingModal";
+import { normalizeFee } from "@/lib/price";
 import { coachesStore } from "@/lib/admin-data";
 import { getCoachImageBySport } from "@/lib/coach-images";
 
@@ -38,6 +40,26 @@ export function CoachesSection({
       return defaultCoaches;
     }
   });
+
+  const [activeCoach, setActiveCoach] = useState<BookingItem | null>(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+
+  const handleBookCoach = (coach: CoachData) => {
+    const { amount, sessionLabel } = normalizeFee(coach.fee);
+    setActiveCoach({
+      category: "coach",
+      name: coach.name,
+      sport: coach.sport,
+      academy: coach.academy,
+      specialization: coach.specialization,
+      location: coach.location,
+      experience: coach.experience,
+      sessionLabel,
+      fee: coach.fee,
+      amount,
+    });
+    setShowBookingModal(true);
+  };
 
   useEffect(() => {
     if (propCoaches && propCoaches.length > 0) {
@@ -99,11 +121,32 @@ export function CoachesSection({
 
   return (
     <SectionWrapper id="coaches" title={title} subtitle={subtitle} className="bg-[#F4F6F8]">
+      <div className="mb-4 flex justify-center">
+        <span className="inline-flex items-center rounded-full bg-[#E8F5E9] px-4 py-2 text-sm font-medium text-[#2E7D32] border border-[#C8E6C9] shadow-sm">
+          Save 50% on coaching sessions today
+        </span>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {visible.map((coach) => (
-          <CoachCard key={`${coach.name}-${coach.academy}`} {...coach} onContact={() => onContact?.(coach)} />
+          <CoachCard
+            key={`${coach.name}-${coach.academy}`}
+            {...coach}
+            discountLabel="50% Discount"
+            onContact={() => {
+              handleBookCoach(coach);
+              onContact?.(coach);
+            }}
+          />
         ))}
       </div>
+
+      <BookingModal
+        open={showBookingModal}
+        item={activeCoach}
+        onClose={() => setShowBookingModal(false)}
+        onSuccess={() => setShowBookingModal(false)}
+      />
 
       {/* Pagination controls */}
       <div className="mt-6 flex items-center justify-between">

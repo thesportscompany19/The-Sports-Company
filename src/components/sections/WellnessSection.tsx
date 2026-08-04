@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { SectionWrapper } from "@/components/common/SectionWrapper";
 import { CustomTabs } from "@/components/common/CustomTabs";
 import { WellnessCard, type WellnessCardProps } from "@/components/cards/WellnessCard";
-import { WellnessBookingModal } from "@/components/form/WellnessBookingModal";
+import { BookingModal, type WellnessBookingItem } from "@/components/form/BookingModal";
+import { normalizeFee } from "@/lib/price";
 import { Brain, Heart, Dumbbell } from "lucide-react";
 import { wellnessStore, type AdminWellness, type WellnessType } from "@/lib/admin-data";
 
@@ -17,13 +18,6 @@ const WELLNESS_TABS = [
 ];
 
 const PAGE_SIZE = 6;
-
-function normalizeFee(fee: string): { sessionLabel: string; amount: number } {
-  const label = fee.toLowerCase().includes("month") ? "Monthly" : "Per Session";
-  const match = fee.replace(/,/g, "").match(/(\d+)/);
-  const amount = match ? Number(match[0]) : 0;
-  return { sessionLabel: label, amount };
-}
 
 function mapWellnessData(item: AdminWellness): WellnessData {
   const { amount, sessionLabel } = normalizeFee(item.fee);
@@ -49,7 +43,7 @@ export function WellnessSection({
   title = "Wellness & Fitness",
   subtitle = "Connect with certified professionals to support your athletic journey",
 }: WellnessSectionProps) {
-  const [activeItem, setActiveItem] = useState<WellnessData | null>(null);
+  const [activeItem, setActiveItem] = useState<WellnessBookingItem | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [wellnessItems, setWellnessItems] = useState<WellnessData[]>([]);
   const [pageIndexes, setPageIndexes] = useState<Record<WellnessType, number>>({
@@ -90,7 +84,18 @@ export function WellnessSection({
   );
 
   const handleBook = (item: WellnessData) => {
-    setActiveItem(item);
+    const { amount, sessionLabel } = normalizeFee(item.fee);
+    setActiveItem({
+      category: "wellness",
+      type: item.type,
+      name: item.name,
+      specialization: item.specialization,
+      location: item.location,
+      experience: item.experience,
+      sessionLabel,
+      fee: item.fee,
+      amount,
+    });
     setShowBookingModal(true);
   };
 
@@ -100,6 +105,12 @@ export function WellnessSection({
 
   return (
     <SectionWrapper id="wellness" title={title} subtitle={subtitle}>
+      <div className="mb-4 flex justify-center">
+        <span className="inline-flex items-center rounded-full bg-[#E8F5E9] px-4 py-2 text-sm font-medium text-[#2E7D32] border border-[#C8E6C9] shadow-sm">
+          Save 50% on wellness bookings today
+        </span>
+      </div>
+
       <CustomTabs tabs={WELLNESS_TABS} variant="dark" centered scrollable>
         {(activeTab) => {
           const activeType = activeTab as WellnessType;
@@ -120,6 +131,7 @@ export function WellnessSection({
                     <WellnessCard
                       key={`${item.type}-${item.name}`}
                       {...item}
+                      discountLabel="50% Discount"
                       onBook={() => handleBook(item)}
                     />
                   ))
@@ -174,7 +186,7 @@ export function WellnessSection({
         }}
       </CustomTabs>
 
-      <WellnessBookingModal
+      <BookingModal
         open={showBookingModal}
         item={activeItem}
         onClose={() => setShowBookingModal(false)}

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,7 @@ export interface WellnessCardProps {
   fee: string;
   amount: number;
   type?: WellnessType;
+  discountLabel?: string;
   onBook?: () => void;
   className?: string;
 }
@@ -29,6 +31,7 @@ export function WellnessCard({
   experience,
   sessionLabel,
   fee,
+  discountLabel,
   onBook,
   className,
 }: WellnessCardProps) {
@@ -56,9 +59,16 @@ export function WellnessCard({
         <p className="text-sm text-gray-500 mt-1">{experience}</p>
 
         {/* Fee box */}
-        <div className="bg-gray-100 rounded-md p-2 mt-3 flex items-center justify-between">
-          <span className="text-xs text-gray-500">{sessionLabel}</span>
-          <span className="text-[#C62828] font-semibold text-sm">{fee}</span>
+        <div className="bg-gray-100 rounded-md p-3 mt-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-xs text-gray-500">{sessionLabel}</span>
+            <span className="text-[#C62828] font-semibold text-sm">{fee}</span>
+          </div>
+          {discountLabel ? (
+            <Badge className="mt-3 rounded-full bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9] px-3 py-1 text-xs font-semibold">
+              {discountLabel}
+            </Badge>
+          ) : null}
         </div>
 
         {/* CTA */}
