@@ -20,7 +20,7 @@ const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Ath
 type FormData = Omit<AdminCoach, "id">;
 
 const EMPTY_FORM: FormData = {
-  image: "/images/event-1.png", name: "", sport: "Cricket",
+  image: "/images/event-1.png", name: "", email: "", sport: "Cricket",
   academy: "", location: "", specialization: "", experience: "", fee: "", status: "active",
 };
 
@@ -57,7 +57,7 @@ export default function CoachesPage() {
   function openAdd() { setEditId(null); setForm(EMPTY_FORM); setFormErrors({}); setShowModal(true); }
   function openEdit(item: AdminCoach) {
     setEditId(item.id);
-    setForm({ image: item.image, name: item.name, sport: item.sport, academy: item.academy, location: item.location, specialization: item.specialization, experience: item.experience, fee: item.fee, status: item.status });
+    setForm({ image: item.image, name: item.name, email: item.email || "", sport: item.sport, academy: item.academy, location: item.location, specialization: item.specialization, experience: item.experience, fee: item.fee, status: item.status });
     setFormErrors({}); setShowModal(true);
   }
 
@@ -225,6 +225,10 @@ export default function CoachesPage() {
               <SelectContent>{SPORTS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
             </Select>
           </div>
+        </div>
+        <div>
+          <Label className="text-xs font-medium text-gray-700">Coach Email</Label>
+          <Input className="mt-1.5" type="email" value={form.email || ""} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="coach@example.com" />
         </div>
         <div>
           <Label className="text-xs font-medium text-gray-700">Academy <span className="text-red-500">*</span></Label>

@@ -36,6 +36,7 @@ export interface AdminCoach {
   id: string;
   image: string;
   name: string;
+  email?: string;
   sport: string;
   academy: string;
   location: string;
@@ -81,6 +82,7 @@ export interface AdminWellness {
   id: string;
   image: string;
   name: string;
+  email?: string;
   type: WellnessType;
   specialization: string;
   location: string;

@@ -6,9 +6,12 @@ import { CoachBooking } from "@/models/CoachBooking";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { coachName, sport, academy, specialization, location, experience, sessionLabel, amount } = body;
+    const { customerName, customerEmail, customerPhone, coachName, coachEmail, sport, academy, specialization, location, experience, sessionLabel, amount } = body;
 
     const errors: string[] = [];
+    if (!customerName || typeof customerName !== "string") errors.push("Customer name is required.");
+    if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) errors.push("A valid customer email is required.");
+    if (!coachEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coachEmail)) errors.push("A valid coach email is required.");
     if (!coachName || typeof coachName !== "string" || coachName.trim().length < 2) {
       errors.push("Coach name is required.");
     }
@@ -42,7 +45,9 @@ export async function POST(req: NextRequest) {
 
     await connectToDatabase();
     const booking = await CoachBooking.create({
+      customerName: customerName.trim(), customerEmail: customerEmail.trim().toLowerCase(), customerPhone: customerPhone?.trim() || "",
       coachName: coachName.trim(),
+      coachEmail: coachEmail?.trim().toLowerCase() || "",
       sport: sport.trim(),
       academy: academy.trim(),
       specialization: specialization.trim(),

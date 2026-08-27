@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { connectToDatabase } from "@/lib/mongodb";
 import { WellnessBooking } from "@/models/WellnessBooking";
+import { sendPaymentEmails } from "@/lib/payment-email";
+import { sendPaymentWhatsApp } from "@/lib/payment-whatsapp";
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,6 +55,25 @@ export async function POST(req: NextRequest) {
         { status: 404 }
       );
     }
+
+    try {
+      await sendPaymentEmails({
+        category: "wellness", customerName: booking.customerName, customerEmail: booking.customerEmail,
+        customerPhone: booking.customerPhone, providerName: booking.providerName, providerEmail: booking.providerEmail,
+        serviceName: `${booking.providerName} - ${booking.sessionLabel}`, referenceId: String(booking._id),
+        orderId: booking.razorpayOrderId || razorpay_order_id, paymentId: razorpay_payment_id,
+        amount: booking.amount, currency: "INR", details: { Type: booking.providerType, Location: booking.location, Specialization: booking.specialization },
+      });
+    } catch (emailError) { console.error("Wellness payment email error:", emailError); }
+    try {
+      await sendPaymentWhatsApp({
+        category: "wellness", customerName: booking.customerName, customerEmail: booking.customerEmail,
+        customerPhone: booking.customerPhone, providerName: booking.providerName, providerEmail: booking.providerEmail,
+        serviceName: `${booking.providerName} - ${booking.sessionLabel}`, referenceId: String(booking._id),
+        orderId: booking.razorpayOrderId || razorpay_order_id, paymentId: razorpay_payment_id,
+        amount: booking.amount, currency: "INR", details: { Type: booking.providerType, Location: booking.location, Specialization: booking.specialization },
+      });
+    } catch (whatsappError) { console.error("Wellness WhatsApp error:", whatsappError); }
 
     return NextResponse.json({
       success: true,

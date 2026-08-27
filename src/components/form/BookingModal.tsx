@@ -11,6 +11,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Shield } from "lucide-react";
 import { toast } from "sonner";
 import { formatRupee } from "@/lib/price";
@@ -27,6 +29,7 @@ export interface BookingItemBase {
   fee: string;
   amount: number;
   category: BookingCategory;
+  providerEmail?: string;
 }
 
 export interface WellnessBookingItem extends BookingItemBase {
@@ -96,9 +99,18 @@ function loadRazorpayScript(): Promise<boolean> {
 
 export function BookingModal({ open, item, onClose, onSuccess }: BookingModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [customer, setCustomer] = useState({ name: "", email: "", phone: "" });
 
   const handlePay = useCallback(async () => {
     if (!item || isSubmitting) return;
+    if (!item.providerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item.providerEmail)) {
+      toast.error("This provider is not currently accepting online bookings. Please contact our team.");
+      return;
+    }
+    if (!customer.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email.trim())) {
+      toast.error("Please enter your name and a valid email address.");
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -118,6 +130,7 @@ export function BookingModal({ open, item, onClose, onSuccess }: BookingModalPro
       const payload =
         item.category === "coach"
           ? {
+              customerName: customer.name.trim(), customerEmail: customer.email.trim().toLowerCase(), customerPhone: customer.phone.trim(), coachEmail: item.providerEmail,
               coachName: item.name,
               sport: item.sport,
               academy: item.academy,
@@ -128,6 +141,7 @@ export function BookingModal({ open, item, onClose, onSuccess }: BookingModalPro
               amount: discountedAmount,
             }
           : {
+              customerName: customer.name.trim(), customerEmail: customer.email.trim().toLowerCase(), customerPhone: customer.phone.trim(), providerEmail: item.providerEmail,
               providerName: item.name,
               providerType: item.type,
               specialization: item.specialization,
@@ -161,9 +175,9 @@ export function BookingModal({ open, item, onClose, onSuccess }: BookingModalPro
             : `Wellness session booking for ${item.name}`,
         order_id: data.orderId,
         prefill: {
-          name: "",
-          email: "",
-          contact: "",
+          name: customer.name,
+          email: customer.email,
+          contact: customer.phone,
         },
         theme: { color: "#C62828" },
         handler: async (razorpayResponse) => {
@@ -206,7 +220,7 @@ export function BookingModal({ open, item, onClose, onSuccess }: BookingModalPro
       toast.error("Network error. Please try again.");
       setIsSubmitting(false);
     }
-  }, [item, isSubmitting, onSuccess]);
+  }, [item, isSubmitting, onSuccess, customer]);
 
   if (!item) return null;
 
@@ -295,6 +309,15 @@ export function BookingModal({ open, item, onClose, onSuccess }: BookingModalPro
           <DialogDescription className="text-sm text-gray-500">
             Secure checkout through Razorpay. The final amount already reflects the discount shown.
           </DialogDescription>
+          <div className="rounded-2xl border border-gray-100 bg-white p-4">
+            <h3 className="text-sm font-semibold text-[#0B1C2D]">Your contact details</h3>
+            <p className="mt-1 text-xs text-gray-500">We will send your receipt and booking confirmation to this email.</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              <div><Label className="text-xs">Full name *</Label><Input className="mt-1" value={customer.name} onChange={(event) => setCustomer({ ...customer, name: event.target.value })} placeholder="Your name" /></div>
+              <div><Label className="text-xs">Email *</Label><Input className="mt-1" type="email" value={customer.email} onChange={(event) => setCustomer({ ...customer, email: event.target.value })} placeholder="you@example.com" /></div>
+              <div><Label className="text-xs">Phone</Label><Input className="mt-1" type="tel" value={customer.phone} onChange={(event) => setCustomer({ ...customer, phone: event.target.value })} placeholder="Optional" /></div>
+            </div>
+          </div>
         </div>
 
         <DialogFooter className="gap-3 px-6 pb-6 pt-4">

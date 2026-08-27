@@ -8,7 +8,7 @@ import { normalizeFee } from "@/lib/price";
 import { coachesStore } from "@/lib/admin-data";
 import { getCoachImageBySport } from "@/lib/coach-images";
 
-export type CoachData = Omit<CoachCardProps, "onContact" | "className">;
+export type CoachData = Omit<CoachCardProps, "onContact" | "className"> & { providerEmail?: string };
 
 const defaultCoaches: CoachData[] = [
   { image: getCoachImageBySport("Cricket"), name: "Ravi Shastri", sport: "Cricket", academy: "National Cricket Academy", location: "Mumbai, Maharashtra", specialization: "Batting", experience: "15 Years", fee: "₹2,500 / Session" },
@@ -35,7 +35,7 @@ export function CoachesSection({
   const [coaches, setCoaches] = useState<CoachData[]>(() => {
     try {
       const list = coachesStore.getAll();
-      return list.map((c) => ({ image: getCoachImageBySport(c.sport), name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee }));
+      return list.map((c) => ({ image: getCoachImageBySport(c.sport), providerEmail: c.email, name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee }));
     } catch {
       return defaultCoaches;
     }
@@ -49,6 +49,7 @@ export function CoachesSection({
     setActiveCoach({
       category: "coach",
       name: coach.name,
+      providerEmail: coach.providerEmail,
       sport: coach.sport,
       academy: coach.academy,
       specialization: coach.specialization,
@@ -63,7 +64,7 @@ export function CoachesSection({
 
   useEffect(() => {
     if (propCoaches && propCoaches.length > 0) {
-      setCoaches(propCoaches);
+      setCoaches(propCoaches.map((coach) => ({ ...coach, image: getCoachImageBySport(coach.sport) })));
       return;
     }
 
@@ -74,7 +75,7 @@ export function CoachesSection({
         const data = await res.json();
         if (!mounted) return;
         if (data?.success && Array.isArray(data.coaches)) {
-          setCoaches(data.coaches.map((c: any) => ({ image: getCoachImageBySport(c.sport), name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee })));
+          setCoaches(data.coaches.map((c: any) => ({ image: getCoachImageBySport(c.sport), providerEmail: c.email, name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee })));
           return;
         }
       } catch (err) {
@@ -84,7 +85,7 @@ export function CoachesSection({
       // fallback to local admin store
       try {
         const list = coachesStore.getAll();
-        if (mounted) setCoaches(list.map((c) => ({ image: getCoachImageBySport(c.sport), name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee })));
+        if (mounted) setCoaches(list.map((c) => ({ image: getCoachImageBySport(c.sport), providerEmail: c.email, name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee })));
       } catch (e) {
         // keep defaults
       }

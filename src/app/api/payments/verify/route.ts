@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Player } from "@/models/Player";
+import { sendPaymentEmails } from "@/lib/payment-email";
+import { sendPaymentWhatsApp } from "@/lib/payment-whatsapp";
 
 export async function POST(req: NextRequest) {
   try {
@@ -56,6 +58,23 @@ export async function POST(req: NextRequest) {
         { status: 404 }
       );
     }
+
+    try {
+      await sendPaymentEmails({
+        category: "registration", customerName: player.fullName, customerEmail: player.email,
+        customerPhone: player.mobile, serviceName: "Player Registration", referenceId: String(player._id),
+        orderId: player.razorpayOrderId || razorpay_order_id, paymentId: razorpay_payment_id,
+        amount: 99, currency: "INR", details: { Sports: player.sports.join(", "), City: player.city, "Date of birth": player.dob },
+      });
+    } catch (emailError) { console.error("Registration payment email error:", emailError); }
+    try {
+      await sendPaymentWhatsApp({
+        category: "registration", customerName: player.fullName, customerEmail: player.email,
+        customerPhone: player.mobile, serviceName: "Player Registration", referenceId: String(player._id),
+        orderId: player.razorpayOrderId || razorpay_order_id, paymentId: razorpay_payment_id,
+        amount: 99, currency: "INR", details: { Sports: player.sports.join(", "), City: player.city, "Date of birth": player.dob },
+      });
+    } catch (whatsappError) { console.error("Registration WhatsApp error:", whatsappError); }
 
     return NextResponse.json({
       success: true,

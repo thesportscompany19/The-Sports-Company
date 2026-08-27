@@ -1,7 +1,11 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ICoachBooking extends Document {
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
   coachName: string;
+  coachEmail?: string;
   sport: string;
   academy: string;
   specialization: string;
@@ -18,7 +22,11 @@ export interface ICoachBooking extends Document {
 
 const CoachBookingSchema = new Schema<ICoachBooking>(
   {
+    customerName: { type: String, required: true, trim: true },
+    customerEmail: { type: String, required: true, trim: true, lowercase: true },
+    customerPhone: { type: String, default: "" },
     coachName: { type: String, required: true, trim: true },
+    coachEmail: { type: String, default: "", trim: true, lowercase: true },
     sport: { type: String, required: true, trim: true },
     academy: { type: String, required: true, trim: true },
     specialization: { type: String, required: true, trim: true },

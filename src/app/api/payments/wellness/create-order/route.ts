@@ -7,7 +7,11 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const {
+      customerName,
+      customerEmail,
+      customerPhone,
       providerName,
+      providerEmail,
       providerType,
       specialization,
       location,
@@ -17,6 +21,9 @@ export async function POST(req: NextRequest) {
     } = body;
 
     const errors: string[] = [];
+    if (!customerName || typeof customerName !== "string") errors.push("Customer name is required.");
+    if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) errors.push("A valid customer email is required.");
+    if (!providerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(providerEmail)) errors.push("A valid provider email is required.");
     if (!providerName || typeof providerName !== "string" || providerName.trim().length < 2) {
       errors.push("Provider name is required.");
     }
@@ -47,7 +54,9 @@ export async function POST(req: NextRequest) {
 
     await connectToDatabase();
     const booking = await WellnessBooking.create({
+      customerName: customerName.trim(), customerEmail: customerEmail.trim().toLowerCase(), customerPhone: customerPhone?.trim() || "",
       providerName: providerName.trim(),
+      providerEmail: providerEmail?.trim().toLowerCase() || "",
       providerType,
       specialization: specialization.trim(),
       location: location.trim(),

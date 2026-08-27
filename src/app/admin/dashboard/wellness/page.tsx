@@ -31,7 +31,7 @@ const TYPE_LABEL: Record<WellnessType, string> = {
 type FormData = Omit<AdminWellness, "id">;
 
 const EMPTY_FORM: FormData = {
-  image: "/images/event-1.png", name: "", type: "psychologists",
+  image: "/images/event-1.png", name: "", email: "", type: "psychologists",
   specialization: "", location: "", experience: "", fee: "", status: "active",
 };
 
@@ -68,7 +68,7 @@ export default function WellnessPage() {
   function openAdd() { setEditId(null); setForm(EMPTY_FORM); setFormErrors({}); setShowModal(true); }
   function openEdit(item: AdminWellness) {
     setEditId(item.id);
-    setForm({ image: item.image, name: item.name, type: item.type, specialization: item.specialization, location: item.location, experience: item.experience, fee: item.fee, status: item.status });
+    setForm({ image: item.image, name: item.name, email: item.email || "", type: item.type, specialization: item.specialization, location: item.location, experience: item.experience, fee: item.fee, status: item.status });
     setFormErrors({}); setShowModal(true);
   }
 
@@ -225,6 +225,10 @@ export default function WellnessPage() {
               <SelectContent>{WELLNESS_TYPES.map((t) => <SelectItem key={t} value={t} className="capitalize">{t}</SelectItem>)}</SelectContent>
             </Select>
           </div>
+        </div>
+        <div>
+          <Label className="text-xs font-medium text-gray-700">Provider Email</Label>
+          <Input className="mt-1.5" type="email" value={form.email || ""} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="provider@example.com" />
         </div>
         <div>
           <Label className="text-xs font-medium text-gray-700">Specialization <span className="text-red-500">*</span></Label>

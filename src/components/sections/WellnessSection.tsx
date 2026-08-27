@@ -9,7 +9,7 @@ import { normalizeFee } from "@/lib/price";
 import { Brain, Heart, Dumbbell } from "lucide-react";
 import { wellnessStore, type AdminWellness, type WellnessType } from "@/lib/admin-data";
 
-type WellnessData = Omit<WellnessCardProps, "onBook" | "className"> & { type: WellnessType };
+type WellnessData = Omit<WellnessCardProps, "onBook" | "className"> & { type: WellnessType; providerEmail?: string };
 
 const WELLNESS_TABS = [
   { value: "psychologists", label: "Sports Psychologists", icon: <Brain className="size-4" /> },
@@ -31,6 +31,7 @@ function mapWellnessData(item: AdminWellness): WellnessData {
     amount,
     sessionLabel,
     type: item.type,
+    providerEmail: item.email,
   };
 }
 
@@ -89,6 +90,7 @@ export function WellnessSection({
       category: "wellness",
       type: item.type,
       name: item.name,
+      providerEmail: item.providerEmail,
       specialization: item.specialization,
       location: item.location,
       experience: item.experience,
