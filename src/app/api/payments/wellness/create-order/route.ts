@@ -23,7 +23,9 @@ export async function POST(req: NextRequest) {
     const errors: string[] = [];
     if (!customerName || typeof customerName !== "string") errors.push("Customer name is required.");
     if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) errors.push("A valid customer email is required.");
-    if (!providerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(providerEmail)) errors.push("A valid provider email is required.");
+    if (providerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(providerEmail)) {
+      errors.push("A valid provider email is required when provided.");
+    }
     if (!providerName || typeof providerName !== "string" || providerName.trim().length < 2) {
       errors.push("Provider name is required.");
     }

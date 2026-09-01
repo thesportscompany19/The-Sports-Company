@@ -11,7 +11,9 @@ export async function POST(req: NextRequest) {
     const errors: string[] = [];
     if (!customerName || typeof customerName !== "string") errors.push("Customer name is required.");
     if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) errors.push("A valid customer email is required.");
-    if (!coachEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coachEmail)) errors.push("A valid coach email is required.");
+    if (coachEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coachEmail)) {
+      errors.push("A valid coach email is required when provided.");
+    }
     if (!coachName || typeof coachName !== "string" || coachName.trim().length < 2) {
       errors.push("Coach name is required.");
     }

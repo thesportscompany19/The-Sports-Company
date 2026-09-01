@@ -87,11 +87,7 @@ export function WellnessBookingModal({ open, item, onClose, onSuccess }: Wellnes
   const handlePay = useCallback(async () => {
     if (!item) return;
     if (isSubmitting) return;
-    if (!item.providerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item.providerEmail)) {
-      toast.error("This provider is not currently accepting online bookings. Please contact our team.");
-      return;
-    }
-      if (!customer.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email.trim())) {
+    if (!customer.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email.trim())) {
       toast.error("Please enter your name and a valid email address.");
       return;
     }
