@@ -71,7 +71,7 @@ export function CoachesSection({
     let mounted = true;
     async function fetchCoaches() {
       try {
-        const res = await fetch("/api/coaches");
+        const res = await fetch("/api/coaches", { cache: "no-store" });
         const data = await res.json();
         if (!mounted) return;
         if (data?.success && Array.isArray(data.coaches)) {

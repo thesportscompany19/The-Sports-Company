@@ -41,7 +41,24 @@ export default function CoachesPage() {
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  useEffect(() => { setItems(coachesStore.getAll()); }, []);
+  useEffect(() => {
+    let mounted = true;
+    async function loadCoaches() {
+      try {
+        const response = await fetch("/api/coaches?all=true", { cache: "no-store" });
+        const data = await response.json();
+        if (response.ok && data?.success && Array.isArray(data.coaches)) {
+          if (mounted) setItems(data.coaches);
+          return;
+        }
+      } catch {
+        // Use the browser store when the database is unavailable locally.
+      }
+      if (mounted) setItems(coachesStore.getAll());
+    }
+    loadCoaches();
+    return () => { mounted = false; };
+  }, []);
 
   const filtered = useMemo(() => items.filter((item) => {
     const q = search.toLowerCase();
@@ -52,7 +69,19 @@ export default function CoachesPage() {
     );
   }), [items, search, sportFilter, statusFilter]);
 
-  function reload() { setItems(coachesStore.getAll()); }
+  async function reload() {
+    try {
+      const response = await fetch("/api/coaches?all=true", { cache: "no-store" });
+      const data = await response.json();
+      if (response.ok && data?.success && Array.isArray(data.coaches)) {
+        setItems(data.coaches);
+        return;
+      }
+    } catch {
+      // Use the browser store when the database is unavailable locally.
+    }
+    setItems(coachesStore.getAll());
+  }
 
   function openAdd() { setEditId(null); setForm(EMPTY_FORM); setFormErrors({}); setShowModal(true); }
   function openEdit(item: AdminCoach) {
@@ -73,18 +102,40 @@ export default function CoachesPage() {
     return Object.keys(errs).length === 0;
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (!validate()) return;
     const payload = { ...form, image: getCoachImageBySport(form.sport) };
-    if (editId) { coachesStore.update(editId, payload); } else { coachesStore.add(payload); }
-    reload();
+    let savedRemotely = false;
+    try {
+      const response = await fetch(editId ? `/api/coaches/${editId}` : "/api/coaches", {
+        method: editId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      savedRemotely = response.ok;
+    } catch {
+      // Fall back to the browser store when the database is unavailable locally.
+    }
+    if (!savedRemotely) {
+      if (editId) coachesStore.update(editId, payload);
+      else coachesStore.add(payload);
+    }
+    await reload();
     try { localStorage.setItem("tida_admin_coaches_update", String(Date.now())); } catch {}
     setShowModal(false);
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!deleteId) return;
-    coachesStore.remove(deleteId); reload();
+    let deletedRemotely = false;
+    try {
+      const response = await fetch(`/api/coaches/${deleteId}`, { method: "DELETE" });
+      deletedRemotely = response.ok;
+    } catch {
+      // Fall back to the browser store when the database is unavailable locally.
+    }
+    if (!deletedRemotely) coachesStore.remove(deleteId);
+    await reload();
     try { localStorage.setItem("tida_admin_coaches_update", String(Date.now())); } catch {}
     setDeleteId(null);
   }
