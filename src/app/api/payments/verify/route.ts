@@ -64,7 +64,12 @@ export async function POST(req: NextRequest) {
         category: "registration", customerName: player.fullName, customerEmail: player.email,
         customerPhone: player.mobile, serviceName: "Player Registration", referenceId: String(player._id),
         orderId: player.razorpayOrderId || razorpay_order_id, paymentId: razorpay_payment_id,
-        amount: 99, currency: "INR", details: { Sports: player.sports.join(", "), City: player.city, "Date of birth": player.dob },
+        amount: 99, currency: "INR", details: {
+          Sports: player.sports.join(", "),
+          City: player.city,
+          "Date of birth": player.dob,
+          ...(player.coachName ? { Coach: player.coachName } : {}),
+        },
       });
     } catch (emailError) { console.error("Registration payment email error:", emailError); }
     try {

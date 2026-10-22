@@ -9,6 +9,7 @@ export interface IPlayer extends Document {
   email: string;
   city: string;
   aadhaar: string;
+  coachName?: string;
   sports: string[];
   paymentStatus: "pending" | "paid" | "failed";
   razorpayOrderId?: string;
@@ -27,6 +28,7 @@ const PlayerSchema = new Schema<IPlayer>(
     email: { type: String, required: true, trim: true, lowercase: true },
     city: { type: String, required: true, trim: true },
     aadhaar: { type: String, required: true, trim: true },
+    coachName: { type: String, trim: true, default: "" },
     sports: { type: [String], required: true, validate: [(v: string[]) => v.length > 0, "Select at least one sport"] },
     paymentStatus: { type: String, enum: ["pending", "paid", "failed"], default: "pending" },
     razorpayOrderId: { type: String, default: "" },

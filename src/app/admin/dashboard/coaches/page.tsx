@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Plus, Search, Edit2, Trash2, RotateCcw } from "lucide-react";
+import Image from "next/image";
+import { Plus, Search, Edit2, Trash2, RotateCcw, ImagePlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { Input } from "@/components/ui/input";
@@ -14,15 +15,21 @@ import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { coachesStore, type AdminCoach } from "@/lib/admin-data";
 import { getCoachImageBySport } from "@/lib/coach-images";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball", "Chess"];
 
 type FormData = Omit<AdminCoach, "id">;
 
 const EMPTY_FORM: FormData = {
-  image: "/images/event-1.png", name: "", email: "", sport: "Cricket",
+  image: "/images/event-1.png", galleryImages: [], name: "", email: "", sport: "Cricket",
   academy: "", location: "", specialization: "", experience: "", fee: "", status: "active",
 };
+
+interface PendingGalleryImage {
+  file: File;
+  preview: string;
+}
 
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
@@ -39,6 +46,8 @@ export default function CoachesPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [pendingGalleryImages, setPendingGalleryImages] = useState<PendingGalleryImage[]>([]);
+  const [galleryError, setGalleryError] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -83,11 +92,79 @@ export default function CoachesPage() {
     setItems(coachesStore.getAll());
   }
 
-  function openAdd() { setEditId(null); setForm(EMPTY_FORM); setFormErrors({}); setShowModal(true); }
+  function clearPendingGalleryImages() {
+    setPendingGalleryImages((current) => {
+      current.forEach(({ preview }) => URL.revokeObjectURL(preview));
+      return [];
+    });
+    setGalleryError("");
+  }
+
+  function openAdd() { clearPendingGalleryImages(); setEditId(null); setForm(EMPTY_FORM); setFormErrors({}); setShowModal(true); }
   function openEdit(item: AdminCoach) {
+    clearPendingGalleryImages();
     setEditId(item.id);
-    setForm({ image: item.image, name: item.name, email: item.email || "", sport: item.sport, academy: item.academy, location: item.location, specialization: item.specialization, experience: item.experience, fee: item.fee, status: item.status });
+    setForm({ image: item.image, galleryImages: item.galleryImages || [], name: item.name, email: item.email || "", sport: item.sport, academy: item.academy, location: item.location, specialization: item.specialization, experience: item.experience, fee: item.fee, status: item.status });
     setFormErrors({}); setShowModal(true);
+  }
+
+  function handleGallerySelection(files: FileList | null) {
+    if (!files?.length) return;
+    setGalleryError("");
+    const selectedFiles = Array.from(files);
+    const currentCount = (form.galleryImages || []).length + pendingGalleryImages.length;
+    if (currentCount + selectedFiles.length > 10) {
+      setGalleryError("A coach and academy can have up to 10 gallery images.");
+      return;
+    }
+
+    const invalidFile = selectedFiles.find((file) => !["image/png", "image/jpeg", "image/webp"].includes(file.type));
+    if (invalidFile) {
+      setGalleryError("Choose PNG, JPEG, or WebP images only.");
+      return;
+    }
+    if (selectedFiles.some((file) => file.size === 0 || file.size > 2 * 1024 * 1024)) {
+      setGalleryError("Each image must be no larger than 2 MB.");
+      return;
+    }
+    const pendingSize = pendingGalleryImages.reduce((total, image) => total + image.file.size, 0);
+    if (pendingSize + selectedFiles.reduce((total, file) => total + file.size, 0) > 12 * 1024 * 1024) {
+      setGalleryError("The combined image upload must be no larger than 12 MB.");
+      return;
+    }
+
+    setPendingGalleryImages((current) => [
+      ...current,
+      ...selectedFiles.map((file) => ({ file, preview: URL.createObjectURL(file) })),
+    ]);
+  }
+
+  function removePendingGalleryImage(preview: string) {
+    URL.revokeObjectURL(preview);
+    setPendingGalleryImages((current) => current.filter((image) => image.preview !== preview));
+    setGalleryError("");
+  }
+
+  async function removeGalleryImage(imageUrl: string) {
+    if (!editId) return;
+    try {
+      const response = await fetch(imageUrl, { method: "DELETE" });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        toast.error(data.errors?.join(", ") || "Unable to remove gallery image.");
+        return;
+      }
+      setForm((current) => ({
+        ...current,
+        galleryImages: (current.galleryImages || []).filter((url) => url !== imageUrl),
+      }));
+      setItems((current) => current.map((item) => item.id === editId
+        ? { ...item, galleryImages: (item.galleryImages || []).filter((url) => url !== imageUrl) }
+        : item));
+      toast.success("Gallery image removed.");
+    } catch {
+      toast.error("Network error while removing the gallery image.");
+    }
   }
 
   function validate(): boolean {
@@ -106,22 +183,63 @@ export default function CoachesPage() {
     if (!validate()) return;
     const payload = { ...form, image: getCoachImageBySport(form.sport) };
     let savedRemotely = false;
+    let coachId = editId;
     try {
       const response = await fetch(editId ? `/api/coaches/${editId}` : "/api/coaches", {
         method: editId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      savedRemotely = response.ok;
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        if (pendingGalleryImages.length > 0) {
+          toast.error(data.errors?.join(", ") || "Save the coach before uploading gallery images.");
+          return;
+        }
+      } else {
+        savedRemotely = true;
+        coachId = data.coach?.id || editId;
+      }
     } catch {
-      // Fall back to the browser store when the database is unavailable locally.
+      if (pendingGalleryImages.length > 0) {
+        toast.error("Connect to the server before uploading gallery images.");
+        return;
+      }
     }
     if (!savedRemotely) {
       if (editId) coachesStore.update(editId, payload);
       else coachesStore.add(payload);
+    } else if (pendingGalleryImages.length > 0 && coachId) {
+      const imageForm = new FormData();
+      pendingGalleryImages.forEach(({ file }) => imageForm.append("images", file, file.name));
+      try {
+        const response = await fetch(`/api/coaches/${coachId}/images`, { method: "POST", body: imageForm });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          if (!editId) setEditId(coachId);
+          await reload();
+          toast.error(data.errors?.join(", ") || "Coach saved, but the gallery images could not be uploaded.");
+          return;
+        }
+        clearPendingGalleryImages();
+      } catch {
+        if (!editId) setEditId(coachId);
+        await reload();
+        toast.error("Coach saved, but the gallery image upload failed. Please try again.");
+        return;
+      }
+    } else if (pendingGalleryImages.length > 0) {
+      toast.error("The coach was saved, but the gallery could not be linked. Please reopen the coach and try again.");
+      return;
     }
     await reload();
     try { localStorage.setItem("tida_admin_coaches_update", String(Date.now())); } catch {}
+    if (!savedRemotely && pendingGalleryImages.length > 0) {
+      toast.error("Gallery image uploads require a server-connected coach record.");
+      return;
+    }
+    clearPendingGalleryImages();
+    toast.success(editId ? "Coach updated!" : "Coach added!");
     setShowModal(false);
   }
 
@@ -256,7 +374,10 @@ export default function CoachesPage() {
       {/* Add / Edit Modal */}
       <AdminModal
         open={showModal}
-        onOpenChange={setShowModal}
+        onOpenChange={(open) => {
+          if (!open) clearPendingGalleryImages();
+          setShowModal(open);
+        }}
         title={editId ? "Edit Coach" : "Add New Coach"}
         subtitle={editId ? "Update coach details below." : "Fill in the details to add a new coach."}
         size="xl"
@@ -280,6 +401,62 @@ export default function CoachesPage() {
         <div>
           <Label className="text-xs font-medium text-gray-700">Coach Email</Label>
           <Input className="mt-1.5" type="email" value={form.email || ""} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="coach@example.com" />
+        </div>
+        <div className="space-y-2">
+          <div>
+            <Label htmlFor="coach-gallery-images" className="text-xs font-medium text-gray-700">Coach &amp; Academy Gallery</Label>
+            <p className="mt-1 text-xs leading-relaxed text-gray-500">
+              Select multiple photos at once. PNG, JPEG, or WebP; up to 2 MB each, 12 MB per upload, and 10 photos per card.
+            </p>
+          </div>
+          <label htmlFor="coach-gallery-images" className="flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-600 transition-colors hover:border-[#C62828] hover:text-[#C62828]">
+            <ImagePlus className="size-4 shrink-0" />
+            Add multiple photos
+          </label>
+          <input
+            id="coach-gallery-images"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            multiple
+            className="sr-only"
+            onChange={(event) => {
+              handleGallerySelection(event.target.files);
+              event.target.value = "";
+            }}
+          />
+          {(form.galleryImages?.length || pendingGalleryImages.length) > 0 && (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {(form.galleryImages || []).map((imageUrl) => (
+                <div key={imageUrl} className="relative aspect-[4/3] overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                  <Image src={imageUrl} alt={`${form.name || "Coach"} gallery photo`} fill sizes="(max-width: 640px) 50vw, 180px" className="object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => void removeGalleryImage(imageUrl)}
+                    className="absolute right-1.5 top-1.5 inline-flex size-8 items-center justify-center rounded-full bg-black/65 text-white transition-colors hover:bg-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    aria-label="Remove gallery photo"
+                    title="Remove photo"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+              ))}
+              {pendingGalleryImages.map(({ file, preview }) => (
+                <div key={`${file.name}-${preview}`} className="relative aspect-[4/3] overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                  <Image src={preview} alt={`${file.name} preview`} fill unoptimized sizes="(max-width: 640px) 50vw, 180px" className="object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removePendingGalleryImage(preview)}
+                    className="absolute right-1.5 top-1.5 inline-flex size-8 items-center justify-center rounded-full bg-black/65 text-white transition-colors hover:bg-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    aria-label={`Remove ${file.name}`}
+                    title={`Remove ${file.name}`}
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {galleryError && <p className="text-xs text-red-500" role="alert">{galleryError}</p>}
         </div>
         <div>
           <Label className="text-xs font-medium text-gray-700">Academy <span className="text-red-500">*</span></Label>

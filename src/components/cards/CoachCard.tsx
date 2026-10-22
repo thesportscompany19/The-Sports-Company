@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { Badge } from "@/components/ui/badge";
-import { MapPin } from "lucide-react";
+import { Images, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface CoachCardProps {
@@ -15,8 +15,10 @@ export interface CoachCardProps {
   specialization: string;
   experience: string;
   fee: string;
+  galleryImages?: string[];
   discountLabel?: string;
   onContact?: () => void;
+  onGalleryOpen?: () => void;
   className?: string;
 }
 
@@ -29,8 +31,10 @@ export function CoachCard({
   specialization,
   experience,
   fee,
+  galleryImages = [],
   discountLabel,
   onContact,
+  onGalleryOpen,
   className,
 }: CoachCardProps) {
   return (
@@ -42,8 +46,19 @@ export function CoachCard({
     >
       {/* Image */}
       <div className="relative h-48 w-full shrink-0">
-        <Image src={image} alt={name} fill className="object-cover" />
-        <Badge className="absolute top-3 right-3 bg-[#C62828] text-white text-xs px-3 py-1 rounded-full border-0 hover:bg-[#C62828]">
+        <button
+          type="button"
+          onClick={onGalleryOpen}
+          className="group absolute inset-0 z-0 cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C62828]"
+          aria-label={`Open ${name} and ${academy} photo gallery`}
+        >
+          <Image src={image} alt={`${name} at ${academy}`} fill className="object-cover transition-transform duration-300 hover:scale-105" />
+          <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-gradient-to-t from-black/70 to-transparent px-3 pb-3 pt-8 text-sm font-medium text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
+            <Images className="size-4" />
+            View photos{galleryImages.length > 0 ? ` (${galleryImages.length})` : ""}
+          </span>
+        </button>
+        <Badge className="pointer-events-none absolute top-3 right-3 z-10 bg-[#C62828] text-white text-xs px-3 py-1 rounded-full border-0 hover:bg-[#C62828]">
           {sport}
         </Badge>
       </div>

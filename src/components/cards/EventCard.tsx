@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 export interface EventCardProps {
   image: string;
+  description?: string;
   tag: string;
   title: string;
   date: string;
@@ -40,16 +41,16 @@ export function EventCard({
       )}
     >
       {/* Image */}
-      <div className="relative h-40 w-full">
-        <Image src={image} alt={title} fill className="object-cover" />
+      <div className="relative aspect-[2/1] w-full">
+        <Image src={image} alt={title} fill unoptimized={image.startsWith("data:")} className="object-cover" />
         <Badge className="absolute top-3 right-3 bg-[#C62828] text-white text-xs px-3 py-1 rounded-full border-0 hover:bg-[#C62828]">
           {tag}
         </Badge>
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        <h3 className="font-semibold text-[#0B1C2D]">{title}</h3>
+      <div className="p-4 sm:p-5">
+        <h3 className="font-semibold leading-snug text-[#0B1C2D]">{title}</h3>
 
         <div className="mt-3 space-y-2">
           <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -71,17 +72,17 @@ export function EventCard({
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-3 mt-4">
+        <div className="flex gap-2 mt-4">
           <PrimaryButton
             onClick={onRegister}
-            className="px-4 py-2 rounded-md text-sm cursor-pointer"
+            className="min-w-0 flex-1 px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm cursor-pointer"
           >
             Register
           </PrimaryButton>
           <Button
             variant="outline"
             onClick={onViewDetails}
-            className="border-gray-300 text-[#0B1C2D] px-4 py-2 rounded-md text-sm cursor-pointer"
+            className="min-w-0 flex-1 border-gray-300 text-[#0B1C2D] px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm cursor-pointer"
           >
             View Details
           </Button>

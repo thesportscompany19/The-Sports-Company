@@ -86,8 +86,8 @@ export function DataTable<T>({
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto overscroll-x-contain">
+        <table className="w-full min-w-[720px] text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50/70">
               {columns.map((col) => (

@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Plus, Search, Edit2, Trash2, RotateCcw } from "lucide-react";
+import Image from "next/image";
+import { Plus, Search, Edit2, Trash2, RotateCcw, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { AdminModal } from "@/components/admin/AdminModal";
@@ -19,6 +21,7 @@ type EventStatus = "upcoming" | "ongoing" | "completed" | "cancelled";
 interface AdminEvent {
   id: string;
   image: string;
+  description: string;
   tag: string;
   title: string;
   date: string;
@@ -43,6 +46,7 @@ type FormData = Omit<AdminEvent, "id" | "createdAt">;
 
 const EMPTY_FORM: FormData = {
   image: "/images/event-1.png",
+  description: "",
   tag: "Cricket",
   title: "",
   date: "",
@@ -70,6 +74,7 @@ export default function EventsPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [imageError, setImageError] = useState("");
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -104,18 +109,21 @@ export default function EventsPage() {
     setEditId(null);
     setForm(EMPTY_FORM);
     setFormErrors({});
+    setImageError("");
     setShowModal(true);
   }
 
   function openEdit(item: AdminEvent) {
     setEditId(item.id);
-    setForm({ image: item.image, tag: item.tag, title: item.title, date: item.date, location: item.location, entryFee: item.entryFee, prize: item.prize, status: item.status });
+    setForm({ image: item.image, description: item.description || "", tag: item.tag, title: item.title, date: item.date, location: item.location, entryFee: item.entryFee, prize: item.prize, status: item.status });
     setFormErrors({});
+    setImageError("");
     setShowModal(true);
   }
 
   function validate(): boolean {
     const errs: Partial<Record<keyof FormData, string>> = {};
+    if (imageError) errs.image = imageError;
     if (!form.title.trim()) errs.title = "Title is required.";
     if (!form.date.trim()) errs.date = "Date is required.";
     if (!form.location.trim()) errs.location = "Location is required.";
@@ -133,7 +141,7 @@ export default function EventsPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, createdAt: new Date().toISOString().split("T")[0] }),
+        body: JSON.stringify(form),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -145,6 +153,45 @@ export default function EventsPage() {
       setShowModal(false);
     } catch {
       toast.error("Network error. Please try again.");
+    }
+  }
+
+  async function handleImageChange(file?: File) {
+    setImageError("");
+    if (!file) return;
+    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      setImageError("Choose a PNG, JPEG, or WebP image.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setImageError("The image must be 2 MB or smaller.");
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+    try {
+      const dimensions = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+        const image = new window.Image();
+        image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+        image.onerror = () => reject(new Error("The selected image could not be read."));
+        image.src = imageUrl;
+      });
+      if (dimensions.width !== 1200 || dimensions.height !== 600) {
+        setImageError("Use an image that is exactly 1200 × 600 pixels.");
+        return;
+      }
+
+      const imageData = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("The image could not be read."));
+        reader.onerror = () => reject(new Error("The image could not be read."));
+        reader.readAsDataURL(file);
+      });
+      setForm((current) => ({ ...current, image: imageData }));
+    } catch (error) {
+      setImageError(error instanceof Error ? error.message : "The selected image could not be read.");
+    } finally {
+      URL.revokeObjectURL(imageUrl);
     }
   }
 
@@ -228,7 +275,7 @@ export default function EventsPage() {
   return (
     <div className="space-y-5">
       {/* Page header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-[#0B1C2D]">Events Management</h2>
           <p className="text-sm text-gray-400 mt-0.5">{items.length} total events</p>
@@ -293,7 +340,30 @@ export default function EventsPage() {
           <Input className="mt-1.5" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Inter-City Cricket Championship 2026" />
           <FieldError msg={formErrors.title} />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="event-image" className="text-xs font-medium text-gray-700">Event Banner</Label>
+          <p className="mt-1 text-xs text-gray-500">Required dimensions: 1200 × 600 px. PNG, JPEG, or WebP; max 2 MB.</p>
+          <label htmlFor="event-image" className="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-600 hover:border-[#C62828] hover:text-[#C62828]">
+            <ImagePlus className="size-4" />
+            Choose banner image
+          </label>
+          <input id="event-image" type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => {
+            const file = e.target.files?.[0];
+            e.target.value = "";
+            void handleImageChange(file);
+          }} />
+          {form.image && (
+            <div className="relative mt-3 aspect-[2/1] overflow-hidden rounded-lg border border-gray-200">
+              <Image src={form.image} alt="Event banner preview" fill unoptimized className="object-cover" />
+            </div>
+          )}
+          <FieldError msg={imageError} />
+        </div>
+        <div>
+          <Label htmlFor="event-description" className="text-xs font-medium text-gray-700">Event Details</Label>
+          <Textarea id="event-description" className="mt-1.5 min-h-24" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Share event highlights, format, eligibility, and other information." />
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label className="text-xs font-medium text-gray-700">Sport <span className="text-red-500">*</span></Label>
             <Select value={form.tag} onValueChange={(v) => setForm({ ...form, tag: v })}>
@@ -309,7 +379,7 @@ export default function EventsPage() {
             </Select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label className="text-xs font-medium text-gray-700">Date <span className="text-red-500">*</span></Label>
             <Input className="mt-1.5" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} placeholder="e.g. April 15, 2026" />
@@ -321,7 +391,7 @@ export default function EventsPage() {
             <FieldError msg={formErrors.location} />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label className="text-xs font-medium text-gray-700">Entry Fee <span className="text-red-500">*</span></Label>
             <Input className="mt-1.5" value={form.entryFee} onChange={(e) => setForm({ ...form, entryFee: e.target.value })} placeholder="e.g. ₹199 per player" />

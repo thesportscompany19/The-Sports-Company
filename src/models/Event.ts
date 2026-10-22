@@ -4,6 +4,7 @@ export type EventStatus = "upcoming" | "ongoing" | "completed" | "cancelled";
 
 export interface IEvent extends Document {
   image: string;
+  description: string;
   tag: string;
   title: string;
   date: string;
@@ -18,6 +19,7 @@ export interface IEvent extends Document {
 const EventSchema = new Schema<IEvent>(
   {
     image: { type: String, default: "/images/event-1.png" },
+    description: { type: String, default: "", trim: true },
     tag: { type: String, required: true, trim: true },
     title: { type: String, required: true, trim: true },
     date: { type: String, required: true, trim: true },

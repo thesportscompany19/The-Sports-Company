@@ -1,14 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight, Images } from "lucide-react";
 import { SectionWrapper } from "@/components/common/SectionWrapper";
 import { CoachCard, type CoachCardProps } from "@/components/cards/CoachCard";
 import { BookingModal, type BookingItem } from "@/components/form/BookingModal";
 import { normalizeFee } from "@/lib/price";
 import { coachesStore } from "@/lib/admin-data";
 import { getCoachImageBySport } from "@/lib/coach-images";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-export type CoachData = Omit<CoachCardProps, "onContact" | "className"> & { providerEmail?: string };
+export type CoachData = Omit<CoachCardProps, "onContact" | "onGalleryOpen" | "className"> & { providerEmail?: string };
 
 const defaultCoaches: CoachData[] = [
   { image: getCoachImageBySport("Cricket"), name: "Ravi Shastri", sport: "Cricket", academy: "National Cricket Academy", location: "Mumbai, Maharashtra", specialization: "Batting", experience: "15 Years", fee: "₹2,500 / Session" },
@@ -43,6 +53,30 @@ export function CoachesSection({
 
   const [activeCoach, setActiveCoach] = useState<BookingItem | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [galleryCoach, setGalleryCoach] = useState<CoachData | null>(null);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const galleryTrackRef = useRef<HTMLDivElement>(null);
+
+  const galleryImages = galleryCoach?.galleryImages?.length
+    ? galleryCoach.galleryImages
+    : galleryCoach ? [galleryCoach.image] : [];
+
+  function openGallery(coach: CoachData) {
+    setGalleryCoach(coach);
+    setGalleryIndex(0);
+  }
+
+  function scrollGallery(direction: -1 | 1) {
+    const track = galleryTrackRef.current;
+    if (!track) return;
+    track.scrollBy({ left: direction * track.clientWidth, behavior: "smooth" });
+  }
+
+  useEffect(() => {
+    if (galleryCoach && galleryTrackRef.current) {
+      galleryTrackRef.current.scrollTo({ left: 0 });
+    }
+  }, [galleryCoach]);
 
   const handleBookCoach = (coach: CoachData) => {
     const { amount, sessionLabel } = normalizeFee(coach.fee);
@@ -63,10 +97,7 @@ export function CoachesSection({
   };
 
   useEffect(() => {
-    if (propCoaches && propCoaches.length > 0) {
-      setCoaches(propCoaches.map((coach) => ({ ...coach, image: getCoachImageBySport(coach.sport) })));
-      return;
-    }
+    if (propCoaches && propCoaches.length > 0) return;
 
     let mounted = true;
     async function fetchCoaches() {
@@ -75,18 +106,32 @@ export function CoachesSection({
         const data = await res.json();
         if (!mounted) return;
         if (data?.success && Array.isArray(data.coaches)) {
-          setCoaches(data.coaches.map((c: any) => ({ image: getCoachImageBySport(c.sport), providerEmail: c.email, name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee })));
+          setCoaches(data.coaches.map((coach: CoachData & { email?: string }) => ({
+            ...coach,
+            image: coach.galleryImages?.[0] || coach.image || getCoachImageBySport(coach.sport),
+            providerEmail: coach.email,
+          })));
           return;
         }
-      } catch (err) {
+      } catch {
         // ignore API errors and fallback to local store
       }
 
       // fallback to local admin store
       try {
         const list = coachesStore.getAll();
-        if (mounted) setCoaches(list.map((c) => ({ image: getCoachImageBySport(c.sport), providerEmail: c.email, name: c.name, sport: c.sport, academy: c.academy, location: c.location, specialization: c.specialization, experience: c.experience, fee: c.fee })));
-      } catch (e) {
+        if (mounted) setCoaches(list.map((coach) => ({
+          image: getCoachImageBySport(coach.sport),
+          providerEmail: coach.email,
+          name: coach.name,
+          sport: coach.sport,
+          academy: coach.academy,
+          location: coach.location,
+          specialization: coach.specialization,
+          experience: coach.experience,
+          fee: coach.fee,
+        })));
+      } catch {
         // keep defaults
       }
     }
@@ -104,21 +149,22 @@ export function CoachesSection({
     return () => { mounted = false; window.removeEventListener("storage", onStorage); };
   }, [propCoaches]);
 
+  const displayedCoaches = propCoaches && propCoaches.length > 0
+    ? propCoaches.map((coach) => ({
+      ...coach,
+      image: coach.galleryImages?.[0] || coach.image || getCoachImageBySport(coach.sport),
+    }))
+    : coaches;
+
   // Pagination
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(9);
-  const total = coaches.length;
+  const total = displayedCoaches.length;
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
-
-  // keep page in range when coaches or pageSize changes
-  useEffect(() => {
-    if (page > pageCount) setPage(pageCount);
-    if (page < 1) setPage(1);
-  }, [pageCount, page]);
-
-  const startIdx = (page - 1) * pageSize;
-  const endIdx = Math.min(total, page * pageSize);
-  const visible = coaches.slice(startIdx, endIdx);
+  const currentPage = Math.min(page, pageCount);
+  const startIdx = (currentPage - 1) * pageSize;
+  const endIdx = Math.min(total, currentPage * pageSize);
+  const visible = displayedCoaches.slice(startIdx, endIdx);
 
   return (
     <SectionWrapper id="coaches" title={title} subtitle={subtitle} className="bg-[#F4F6F8]">
@@ -134,6 +180,7 @@ export function CoachesSection({
             key={`${coach.name}-${coach.academy}`}
             {...coach}
             discountLabel="50% Discount"
+            onGalleryOpen={() => openGallery(coach)}
             onContact={() => {
               handleBookCoach(coach);
               onContact?.(coach);
@@ -148,6 +195,76 @@ export function CoachesSection({
         onClose={() => setShowBookingModal(false)}
         onSuccess={() => setShowBookingModal(false)}
       />
+
+      <Dialog
+        open={Boolean(galleryCoach)}
+        onOpenChange={(open) => {
+          if (!open) setGalleryCoach(null);
+        }}
+      >
+        {galleryCoach && (
+          <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] gap-0 overflow-hidden p-0 sm:max-w-4xl">
+            <DialogHeader className="px-4 pb-3 pt-4 pr-12 sm:px-6 sm:pt-5">
+              <DialogTitle className="text-lg font-semibold text-[#0B1C2D] sm:text-xl">
+                {galleryCoach.name}
+              </DialogTitle>
+              <DialogDescription className="flex items-center gap-2 text-sm">
+                <Images className="size-4 shrink-0" />
+                {galleryCoach.academy} · {galleryImages.length} {galleryImages.length === 1 ? "photo" : "photos"}
+              </DialogDescription>
+            </DialogHeader>
+            <div
+              ref={galleryTrackRef}
+              className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth bg-[#0B1C2D] [scrollbar-width:thin]"
+              onScroll={(event) => {
+                const track = event.currentTarget;
+                setGalleryIndex(Math.round(track.scrollLeft / track.clientWidth));
+              }}
+              aria-label={`${galleryCoach.name} photo gallery`}
+            >
+              {galleryImages.map((src, index) => (
+                <div key={`${src}-${index}`} className="relative h-[min(58vh,560px)] min-w-full snap-center">
+                  <Image
+                    src={src}
+                    alt={`${galleryCoach.name} and ${galleryCoach.academy}, photo ${index + 1}`}
+                    fill
+                    unoptimized={src.startsWith("blob:") || src.startsWith("data:")}
+                    sizes="(max-width: 640px) 100vw, 896px"
+                    className="object-contain"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-between gap-3 px-3 py-3 sm:px-5">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="size-9 shrink-0 rounded-full"
+                disabled={galleryIndex <= 0}
+                onClick={() => scrollGallery(-1)}
+                aria-label="Previous photo"
+              >
+                <ChevronLeft className="size-5" />
+              </Button>
+              <span className="text-sm font-medium text-gray-600" aria-live="polite">
+                {galleryIndex + 1} / {galleryImages.length}
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="size-9 shrink-0 rounded-full"
+                disabled={galleryIndex >= galleryImages.length - 1}
+                onClick={() => scrollGallery(1)}
+                aria-label="Next photo"
+              >
+                <ChevronRight className="size-5" />
+              </Button>
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
 
       {/* Pagination controls */}
       <div className="mt-6 flex items-center justify-between">
@@ -164,9 +281,9 @@ export function CoachesSection({
           </select>
 
           <div className="flex items-center gap-1">
-            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 rounded-md bg-white border text-sm disabled:opacity-50">Prev</button>
-            <div className="px-2 text-sm">{page} / {pageCount}</div>
-            <button onClick={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={page === pageCount} className="px-3 py-1 rounded-md bg-white border text-sm disabled:opacity-50">Next</button>
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 rounded-md bg-white border text-sm disabled:opacity-50">Prev</button>
+            <div className="px-2 text-sm">{currentPage} / {pageCount}</div>
+            <button onClick={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={currentPage === pageCount} className="px-3 py-1 rounded-md bg-white border text-sm disabled:opacity-50">Next</button>
           </div>
         </div>
       </div>

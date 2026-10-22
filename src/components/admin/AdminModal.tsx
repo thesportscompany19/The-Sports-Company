@@ -37,12 +37,12 @@ export function AdminModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          "p-0 gap-0 overflow-hidden",
+          "grid-rows-[auto_minmax(0,1fr)_auto] max-h-[calc(100dvh-1rem)] p-0 gap-0 overflow-hidden",
           SIZE_CLASSES[size],
         )}
       >
         {/* Modal Header */}
-        <DialogHeader className="px-6 pt-5 pb-4 border-b border-gray-100 bg-gradient-to-br from-gray-50 to-white gap-0.5 rounded-t-xl">
+        <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-5 pb-4 border-b border-gray-100 bg-gradient-to-br from-gray-50 to-white gap-0.5 rounded-t-xl">
           <DialogTitle className="text-base font-semibold text-[#0B1C2D] pr-8 leading-tight">
             {title}
           </DialogTitle>
@@ -54,12 +54,12 @@ export function AdminModal({
         </DialogHeader>
 
         {/* Scrollable Body */}
-        <div className="px-6 py-5 space-y-4 overflow-y-auto max-h-[65vh] [scrollbar-width:thin]">
+        <div className="min-h-0 px-4 sm:px-6 py-4 sm:py-5 space-y-4 overflow-y-auto [scrollbar-width:thin]">
           {children}
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-end gap-2.5 px-6 py-4 border-t border-gray-100 bg-gray-50/60 rounded-b-xl">
+        <div className="flex items-center justify-end gap-2.5 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 bg-gray-50/60 rounded-b-xl">
           <Button
             variant="outline"
             size="sm"

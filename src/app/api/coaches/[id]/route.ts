@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Coach, type CoachStatus } from "@/models/Coach";
+import { CoachGalleryImage } from "@/models/CoachGalleryImage";
 
 const VALID_SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball", "Chess"];
 const VALID_STATUSES: CoachStatus[] = ["active", "inactive"];
@@ -33,6 +34,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     await connectToDatabase();
     const coach = await Coach.findByIdAndDelete(id);
     if (!coach) return NextResponse.json({ success: false, errors: ["Coach not found."] }, { status: 404 });
+    await CoachGalleryImage.deleteMany({ coachId: id });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Delete coach error:", error);

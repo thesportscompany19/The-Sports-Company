@@ -20,6 +20,12 @@ const COMPANY_NAME = "The Sports Company";
 const COMPANY_EMAIL = process.env.COMPANY_EMAIL || process.env.SMTP_USER || "";
 const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || COMPANY_EMAIL;
 
+function getOrganizationEmails() {
+  return [COMPANY_EMAIL, ...(process.env.PAYMENT_NOTIFICATION_EMAILS || "").split(/[;,]/)]
+    .map((email) => email.trim().toLowerCase())
+    .filter((email, index, all) => Boolean(email) && all.indexOf(email) === index);
+}
+
 function getTransporter() {
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
     throw new Error("SMTP_HOST, SMTP_USER and SMTP_PASSWORD are required to send payment emails");
@@ -46,21 +52,42 @@ function paymentRows(details: PaymentEmailDetails) {
 
 function renderEmail(details: PaymentEmailDetails, audience: "customer" | "provider" | "company") {
   const greeting = audience === "customer" ? `Hello ${details.customerName}` : audience === "provider" ? `Hello ${details.providerName || "Partner"}` : "Hello Team";
-  const subject = audience === "customer" ? "Your payment and booking are confirmed" : audience === "provider" ? "New paid booking received" : "New payment received";
+  const paymentType = details.category === "registration" ? "player registration" : `${details.category} booking`;
+  const subject = audience === "customer"
+    ? details.category === "registration" ? "Your player registration payment is confirmed" : "Your payment and booking are confirmed"
+    : audience === "provider" ? "New paid booking received" : `New ${paymentType} payment received`;
+  const confirmationMessage = audience === "customer"
+    ? details.category === "registration"
+      ? "Thank you for registering. Your payment was verified successfully and your player registration is complete."
+      : "Thank you for choosing us. Your payment was verified successfully and your booking is confirmed."
+    : `A paid ${paymentType} has been confirmed for ${details.serviceName}.`;
   return {
     subject: `${subject} | ${COMPANY_NAME}`,
-    html: `<!doctype html><html><body style="margin:0;background:#F4F6F8;font-family:Arial,sans-serif;color:#0B1C2D"><div style="max-width:620px;margin:32px auto;background:#fff;border-radius:16px;overflow:hidden"><div style="background:#0B1C2D;padding:28px 32px;color:#fff"><div style="font-size:12px;letter-spacing:2px;color:#F3B562;text-transform:uppercase">${COMPANY_NAME}</div><h1 style="margin:10px 0 0;font-size:25px">${subject}</h1></div><div style="padding:30px 32px"><p style="font-size:16px">${greeting},</p><p style="color:#475467;line-height:1.6">${audience === "customer" ? "Thank you for choosing us. Your payment was verified successfully and your booking is confirmed." : `A paid ${details.category} booking has been confirmed for ${details.serviceName}.`}</p><div style="border:1px solid #EAECF0;border-radius:12px;padding:18px;margin:24px 0"><h2 style="font-size:16px;margin:0 0 12px">Payment details</h2><table style="width:100%;border-collapse:collapse"><tr><td style="padding:8px 0;color:#667085">Service</td><td style="padding:8px 0;text-align:right;font-weight:600">${escapeHtml(details.serviceName)}</td></tr>${paymentRows(details)}</table></div><p style="color:#667085;font-size:13px;line-height:1.6">Reference: ${escapeHtml(details.referenceId)}${details.customerPhone ? `<br>Customer phone: ${escapeHtml(details.customerPhone)}` : ""}</p><p style="margin-top:28px;color:#475467">Regards,<br><strong>${COMPANY_NAME}</strong></p></div><div style="padding:18px 32px;background:#FDF2F2;color:#667085;font-size:12px">This is an automated payment confirmation. Please keep it for your records.</div></div></body></html>`,
-    text: `${subject}\n\n${greeting},\n\nPayment confirmed for ${details.serviceName}.\n\n${Object.entries(details.details).map(([key, value]) => `${key}: ${value}`).join("\n")}\nOrder ID: ${details.orderId}\nPayment ID: ${details.paymentId}\nAmount: ${details.currency} ${details.amount}\nReference: ${details.referenceId}`,
+    html: `<!doctype html><html><body style="margin:0;background:#F4F6F8;font-family:Arial,sans-serif;color:#0B1C2D"><div style="max-width:620px;margin:32px auto;background:#fff;border-radius:16px;overflow:hidden"><div style="background:#0B1C2D;padding:28px 32px;color:#fff"><div style="font-size:12px;letter-spacing:2px;color:#F3B562;text-transform:uppercase">${COMPANY_NAME}</div><h1 style="margin:10px 0 0;font-size:25px">${subject}</h1></div><div style="padding:30px 32px"><p style="font-size:16px">${greeting},</p><p style="color:#475467;line-height:1.6">${confirmationMessage}</p><div style="border:1px solid #EAECF0;border-radius:12px;padding:18px;margin:24px 0"><h2 style="font-size:16px;margin:0 0 12px">Payment details</h2><table style="width:100%;border-collapse:collapse"><tr><td style="padding:8px 0;color:#667085">Service</td><td style="padding:8px 0;text-align:right;font-weight:600">${escapeHtml(details.serviceName)}</td></tr>${paymentRows(details)}</table></div><p style="color:#667085;font-size:13px;line-height:1.6">Reference: ${escapeHtml(details.referenceId)}${details.customerPhone ? `<br>Customer phone: ${escapeHtml(details.customerPhone)}` : ""}</p><p style="margin-top:28px;color:#475467">Regards,<br><strong>${COMPANY_NAME}</strong></p></div><div style="padding:18px 32px;background:#FDF2F2;color:#667085;font-size:12px">This is an automated payment confirmation. Please keep it for your records.</div></div></body></html>`,
+    text: `${subject}\n\n${greeting},\n\n${confirmationMessage}\n\n${Object.entries(details.details).map(([key, value]) => `${key}: ${value}`).join("\n")}\nOrder ID: ${details.orderId}\nPayment ID: ${details.paymentId}\nAmount: ${details.currency} ${details.amount}\nReference: ${details.referenceId}`,
   };
 }
 
 export async function sendPaymentEmails(details: PaymentEmailDetails) {
-  const recipients = [details.customerEmail, details.providerEmail, COMPANY_EMAIL].filter((email, index, all): email is string => Boolean(email) && all.indexOf(email) === index);
+  const recipients = [
+    { email: details.customerEmail, audience: "customer" as const },
+    ...(details.providerEmail ? [{ email: details.providerEmail, audience: "provider" as const }] : []),
+    ...getOrganizationEmails().map((email) => ({ email, audience: "company" as const })),
+  ].reduce((unique, recipient) => {
+    const email = recipient.email.trim().toLowerCase();
+    if (email && !unique.some((existing) => existing.email === email)) {
+      unique.push({ ...recipient, email });
+    }
+    return unique;
+  }, [] as Array<{ email: string; audience: "customer" | "provider" | "company" }>);
   if (!recipients.length) throw new Error("No payment email recipients configured");
   const transporter = getTransporter();
-  await Promise.all(recipients.map(async (recipient) => {
-    const audience = recipient === details.customerEmail ? "customer" : recipient === details.providerEmail ? "provider" : "company";
+  const results = await Promise.allSettled(recipients.map(async ({ email: recipient, audience }) => {
     const email = renderEmail(details, audience);
     await transporter.sendMail({ from: `"${COMPANY_NAME}" <${FROM_EMAIL}>`, to: recipient, subject: email.subject, text: email.text, html: email.html });
   }));
+  const failures = results.filter((result) => result.status === "rejected");
+  if (failures.length) {
+    throw new AggregateError(failures.map((result) => result.reason), `Failed to send ${failures.length} payment notification email(s)`);
+  }
 }

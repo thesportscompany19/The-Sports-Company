@@ -35,6 +35,7 @@ export interface AdminMatch {
 export interface AdminCoach {
   id: string;
   image: string;
+  galleryImages?: string[];
   name: string;
   email?: string;
   sport: string;

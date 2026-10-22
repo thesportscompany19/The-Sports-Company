@@ -11,7 +11,7 @@ const VALID_SPORTS = [
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { fullName, dob, gender, mobile, guardianMobile, email, city, aadhaar, sports } = body;
+    const { fullName, dob, gender, mobile, guardianMobile, email, city, aadhaar, coachName, sports } = body;
 
     // --- Validation ---
     const errors: string[] = [];
@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
       email: email.trim().toLowerCase(),
       city: city.trim(),
       aadhaar: aadhaar.replace(/\s/g, ""),
+      coachName: typeof coachName === "string" ? coachName.trim() : "",
       sports,
       paymentStatus: "pending",
     });
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
         playerId: String(player._id),
         playerName: fullName.trim(),
         email: email.trim().toLowerCase(),
+        ...(typeof coachName === "string" && coachName.trim() ? { coachName: coachName.trim() } : {}),
       },
     });
 

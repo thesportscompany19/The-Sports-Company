@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Event } from "@/models/Event";
+import { EventBanner } from "@/models/EventBanner";
+import { decodeEventImage, isValidEventImage } from "@/lib/event-image";
 
 const VALID_SPORTS = [
   "Cricket", "Football", "Badminton", "Basketball",
@@ -27,6 +29,7 @@ export async function GET(req: NextRequest) {
     const mapped = events.map((e) => ({
       id: String(e._id),
       image: e.image,
+      description: e.description,
       tag: e.tag,
       title: e.title,
       date: e.date,
@@ -51,9 +54,11 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { image, tag, title, date, location, entryFee, prize, status } = body;
+    const { image, description, tag, title, date, location, entryFee, prize, status } = body;
 
     const errors: string[] = [];
+    if (image !== undefined && !isValidEventImage(image)) errors.push("Event image must be a valid PNG, JPEG, or WebP upload under 2 MB.");
+    if (description !== undefined && typeof description !== "string") errors.push("Event description must be text.");
     if (!title || typeof title !== "string" || title.trim().length < 2) errors.push("Title is required.");
     if (!tag || !VALID_SPORTS.includes(tag)) errors.push("Valid sport tag is required.");
     if (!date || typeof date !== "string") errors.push("Date is required.");
@@ -68,8 +73,10 @@ export async function POST(req: NextRequest) {
 
     await connectToDatabase();
 
+    const uploadedImage = typeof image === "string" ? decodeEventImage(image) : null;
     const event = await Event.create({
-      image: image || "/images/event-1.png",
+      image: uploadedImage ? "" : image || "/images/event-1.png",
+      description: typeof description === "string" ? description.trim() : "",
       tag: tag.trim(),
       title: title.trim(),
       date: date.trim(),
@@ -79,12 +86,25 @@ export async function POST(req: NextRequest) {
       status: status || "upcoming",
     });
 
+    if (uploadedImage) {
+      try {
+        await EventBanner.create({ eventId: event._id, ...uploadedImage });
+        event.image = `/api/events/${event._id}/image?v=${Date.now()}`;
+        await event.save();
+      } catch (error) {
+        await Event.deleteOne({ _id: event._id });
+        await EventBanner.deleteOne({ eventId: event._id });
+        throw error;
+      }
+    }
+
     return NextResponse.json(
       {
         success: true,
         event: {
           id: String(event._id),
           image: event.image,
+          description: event.description,
           tag: event.tag,
           title: event.title,
           date: event.date,

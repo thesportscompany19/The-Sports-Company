@@ -36,7 +36,7 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="flex-1 lg:ml-60 flex flex-col min-h-screen">
         <AdminHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 min-w-0 p-3 sm:p-6">{children}</main>
       </div>
     </div>
   );

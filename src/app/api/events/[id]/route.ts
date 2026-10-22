@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Event } from "@/models/Event";
+import { EventBanner } from "@/models/EventBanner";
+import { decodeEventImage, isValidEventImage } from "@/lib/event-image";
 
 const VALID_SPORTS = [
   "Cricket", "Football", "Badminton", "Basketball",
@@ -24,9 +26,11 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const { image, tag, title, date, location, entryFee, prize, status } = body;
+    const { image, description, tag, title, date, location, entryFee, prize, status } = body;
 
     const errors: string[] = [];
+    if (image !== undefined && !isValidEventImage(image)) errors.push("Event image must be a valid PNG, JPEG, or WebP upload under 2 MB.");
+    if (description !== undefined && typeof description !== "string") errors.push("Event description must be text.");
     if (title !== undefined && (!title || title.trim().length < 2)) errors.push("Title is required.");
     if (tag !== undefined && !VALID_SPORTS.includes(tag)) errors.push("Valid sport tag is required.");
     if (status !== undefined && !VALID_STATUSES.includes(status)) errors.push("Invalid status.");
@@ -38,7 +42,23 @@ export async function PUT(
     await connectToDatabase();
 
     const updates: Record<string, unknown> = {};
-    if (image !== undefined) updates.image = image;
+    if (image !== undefined) {
+      const uploadedImage = decodeEventImage(image);
+      if (uploadedImage) {
+        await EventBanner.findOneAndUpdate(
+          { eventId: id },
+          { $set: uploadedImage },
+          { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+        updates.image = `/api/events/${id}/image?v=${Date.now()}`;
+      } else {
+        updates.image = image;
+        if (!image.startsWith(`/api/events/${id}/image`)) {
+          await EventBanner.deleteOne({ eventId: id });
+        }
+      }
+    }
+    if (description !== undefined) updates.description = description.trim();
     if (tag !== undefined) updates.tag = tag.trim();
     if (title !== undefined) updates.title = title.trim();
     if (date !== undefined) updates.date = date.trim();
@@ -61,6 +81,7 @@ export async function PUT(
       event: {
         id: String(event._id),
         image: event.image,
+        description: event.description,
         tag: event.tag,
         title: event.title,
         date: event.date,
@@ -105,6 +126,7 @@ export async function DELETE(
       );
     }
 
+    await EventBanner.deleteOne({ eventId: id });
     return NextResponse.json({ success: true, message: "Event deleted." });
   } catch (error) {
     console.error("Delete event error:", error);
