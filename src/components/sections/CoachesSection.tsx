@@ -60,6 +60,9 @@ export function CoachesSection({
   const galleryImages = galleryCoach?.galleryImages?.length
     ? galleryCoach.galleryImages
     : galleryCoach ? [galleryCoach.image] : [];
+  const coachDiscountAmount = galleryCoach
+    ? Math.round(normalizeFee(galleryCoach.fee).amount * 0.5)
+    : 0;
 
   function openGallery(coach: CoachData) {
     setGalleryCoach(coach);
@@ -182,7 +185,7 @@ export function CoachesSection({
             discountLabel="50% Discount"
             onGalleryOpen={() => openGallery(coach)}
             onContact={() => {
-              handleBookCoach(coach);
+              openGallery(coach);
               onContact?.(coach);
             }}
           />
@@ -203,8 +206,8 @@ export function CoachesSection({
         }}
       >
         {galleryCoach && (
-          <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] gap-0 overflow-hidden p-0 sm:max-w-4xl">
-            <DialogHeader className="px-4 pb-3 pt-4 pr-12 sm:px-6 sm:pt-5">
+          <DialogContent className="flex max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] flex-col gap-0 overflow-y-auto p-0 sm:max-w-4xl">
+            <DialogHeader className="shrink-0 px-4 pb-3 pt-4 pr-12 sm:px-6 sm:pt-5">
               <DialogTitle className="text-lg font-semibold text-[#0B1C2D] sm:text-xl">
                 {galleryCoach.name}
               </DialogTitle>
@@ -215,7 +218,7 @@ export function CoachesSection({
             </DialogHeader>
             <div
               ref={galleryTrackRef}
-              className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth bg-[#0B1C2D] [scrollbar-width:thin]"
+              className="flex h-[min(32dvh,240px)] shrink-0 snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth bg-[#0B1C2D] [scrollbar-width:thin] sm:h-[min(38dvh,320px)]"
               onScroll={(event) => {
                 const track = event.currentTarget;
                 setGalleryIndex(Math.round(track.scrollLeft / track.clientWidth));
@@ -223,7 +226,7 @@ export function CoachesSection({
               aria-label={`${galleryCoach.name} photo gallery`}
             >
               {galleryImages.map((src, index) => (
-                <div key={`${src}-${index}`} className="relative h-[min(58vh,560px)] min-w-full snap-center">
+                <div key={`${src}-${index}`} className="relative h-full min-w-full shrink-0 snap-center">
                   <Image
                     src={src}
                     alt={`${galleryCoach.name} and ${galleryCoach.academy}, photo ${index + 1}`}
@@ -235,7 +238,7 @@ export function CoachesSection({
                 </div>
               ))}
             </div>
-            <div className="flex items-center justify-between gap-3 px-3 py-3 sm:px-5">
+            <div className="flex shrink-0 items-center justify-between gap-3 px-3 py-3 sm:px-5">
               <Button
                 type="button"
                 variant="outline"
@@ -260,6 +263,44 @@ export function CoachesSection({
                 aria-label="Next photo"
               >
                 <ChevronRight className="size-5" />
+              </Button>
+            </div>
+            <div className="max-h-[28dvh] shrink-0 space-y-3 overflow-y-auto border-t border-gray-100 px-4 py-3 sm:max-h-[24dvh] sm:px-6 sm:py-4">
+              <div className="grid gap-2 sm:grid-cols-2">
+                <div className="rounded-lg bg-gray-50 p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Academy</p>
+                  <p className="mt-1 break-words text-sm font-medium text-[#0B1C2D]">{galleryCoach.academy}</p>
+                </div>
+                <div className="rounded-lg bg-gray-50 p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Sport &amp; specialization</p>
+                  <p className="mt-1 break-words text-sm font-medium text-[#0B1C2D]">{galleryCoach.sport} · {galleryCoach.specialization}</p>
+                </div>
+                <div className="rounded-lg bg-gray-50 p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Location</p>
+                  <p className="mt-1 break-words text-sm font-medium text-[#0B1C2D]">{galleryCoach.location}</p>
+                </div>
+                <div className="rounded-lg bg-gray-50 p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Experience &amp; session fee</p>
+                  <p className="mt-1 break-words text-sm font-medium text-[#0B1C2D]">{galleryCoach.experience} · {galleryCoach.fee}</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500">
+                50% discount · Pay {new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(coachDiscountAmount)} after confirmation.
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-gray-100 bg-white px-4 py-3 sm:flex-row sm:justify-end sm:px-6">
+              <Button variant="outline" className="w-full sm:w-auto" onClick={() => setGalleryCoach(null)}>
+                Close details
+              </Button>
+              <Button
+                className="w-full bg-[#C62828] text-white hover:bg-[#a82020] sm:w-auto"
+                onClick={() => {
+                  const coach = galleryCoach;
+                  setGalleryCoach(null);
+                  handleBookCoach(coach);
+                }}
+              >
+                Continue to booking
               </Button>
             </div>
           </DialogContent>

@@ -8,6 +8,7 @@ export interface FormFieldProps {
   id: string;
   label: string;
   type?: string;
+  max?: string;
   placeholder?: string;
   required?: boolean;
   value?: string;
@@ -19,6 +20,7 @@ export function FormField({
   id,
   label,
   type = "text",
+  max,
   placeholder,
   required = false,
   value,
@@ -35,6 +37,7 @@ export function FormField({
         id={id}
         name={id}
         type={type}
+        max={max}
         placeholder={placeholder}
         required={required}
         value={value}

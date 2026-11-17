@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Player } from "@/models/Player";
+import { createSportPlayerIds } from "@/lib/player-ids";
+import { calculatePlayerAge } from "@/lib/player-age";
 
 const VALID_SPORTS = [
-  "Cricket", "Football", "Basketball", "Badminton",
-  "Hockey", "Volleyball", "Swimming", "Athletics", "Tennis",
+  "Cricket", "Football", "Basketball", "Badminton", "Hockey", "Volleyball",
+  "Swimming", "Athletics", "Tennis", "Table Tennis", "Chess", "Skating", "Pickleball",
 ];
 
 export async function POST(req: NextRequest) {
@@ -19,8 +21,8 @@ export async function POST(req: NextRequest) {
     if (!fullName || typeof fullName !== "string" || fullName.trim().length < 2) {
       errors.push("Full name is required (min 2 characters).");
     }
-    if (!dob) {
-      errors.push("Date of birth is required.");
+    if (typeof dob !== "string" || calculatePlayerAge(dob) === null) {
+      errors.push("Enter a valid date of birth. Age must be between 0 and 120 years.");
     }
     if (!gender || !["male", "female", "other"].includes(gender)) {
       errors.push("Gender must be male, female, or other.");
@@ -79,7 +81,34 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   try {
     await connectToDatabase();
-    const players = await Player.find().sort({ createdAt: -1 }).lean();
+    const players = await Player.find()
+      .select("fullName dob gender mobile email city sports paymentStatus sportPlayerIds createdAt")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const legacyPaidPlayers = players.filter((player) =>
+      player.paymentStatus === "paid" && !player.sportPlayerIds?.length
+    );
+    if (legacyPaidPlayers.length) {
+      await Player.bulkWrite(legacyPaidPlayers.map((player) => ({
+        updateOne: {
+          filter: { _id: player._id, $or: [{ sportPlayerIds: { $exists: false } }, { sportPlayerIds: { $size: 0 } }] },
+          update: {
+            $set: {
+              sportPlayerIds: createSportPlayerIds(String(player._id), player.sports, player.createdAt),
+            },
+          },
+        },
+      })));
+      const idsByPlayer = new Map(legacyPaidPlayers.map((player) => [
+        String(player._id),
+        createSportPlayerIds(String(player._id), player.sports, player.createdAt),
+      ]));
+      for (const player of legacyPaidPlayers) {
+        player.sportPlayerIds = idsByPlayer.get(String(player._id)) || [];
+      }
+    }
+
     return NextResponse.json({ success: true, players });
   } catch (error) {
     console.error("Fetch players error:", error);

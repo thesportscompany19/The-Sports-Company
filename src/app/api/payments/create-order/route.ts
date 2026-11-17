@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getRazorpay } from "@/lib/razorpay";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Player } from "@/models/Player";
+import { calculatePlayerAge } from "@/lib/player-age";
 
 const VALID_SPORTS = [
-  "Cricket", "Football", "Basketball", "Badminton",
-  "Hockey", "Volleyball", "Swimming", "Athletics", "Tennis",
+  "Cricket", "Football", "Basketball", "Badminton", "Hockey", "Volleyball",
+  "Swimming", "Athletics", "Tennis", "Table Tennis", "Chess", "Skating", "Pickleball",
 ];
 
 export async function POST(req: NextRequest) {
@@ -19,8 +20,8 @@ export async function POST(req: NextRequest) {
     if (!fullName || typeof fullName !== "string" || fullName.trim().length < 2) {
       errors.push("Full name is required (min 2 characters).");
     }
-    if (!dob) {
-      errors.push("Date of birth is required.");
+    if (typeof dob !== "string" || calculatePlayerAge(dob) === null) {
+      errors.push("Enter a valid date of birth. Age must be between 0 and 120 years.");
     }
     if (!gender || !["male", "female", "other"].includes(gender)) {
       errors.push("Gender must be male, female, or other.");

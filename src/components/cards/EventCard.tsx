@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, IndianRupee, Trophy } from "lucide-react";
+import { Calendar, MapPin, IndianRupee, Trophy, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface EventCardProps {
@@ -42,8 +42,19 @@ export function EventCard({
     >
       {/* Image */}
       <div className="relative aspect-[2/1] w-full">
-        <Image src={image} alt={title} fill unoptimized={image.startsWith("data:")} className="object-cover" />
-        <Badge className="absolute top-3 right-3 bg-[#C62828] text-white text-xs px-3 py-1 rounded-full border-0 hover:bg-[#C62828]">
+        <button
+          type="button"
+          onClick={onViewDetails}
+          className="group absolute inset-0 z-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C62828]"
+          aria-label={`View details for ${title}`}
+        >
+          <Image src={image} alt={title} fill unoptimized={image.startsWith("data:")} sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+          <span className="absolute inset-0 flex items-end justify-center gap-2 bg-gradient-to-t from-black/70 to-transparent px-3 pb-3 pt-10 text-sm font-medium text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
+            <ImageIcon className="size-4" />
+            View event details
+          </span>
+        </button>
+        <Badge className="pointer-events-none absolute top-3 right-3 z-10 bg-[#C62828] text-white text-xs px-3 py-1 rounded-full border-0 hover:bg-[#C62828]">
           {tag}
         </Badge>
       </div>
@@ -84,7 +95,7 @@ export function EventCard({
             onClick={onViewDetails}
             className="min-w-0 flex-1 border-gray-300 text-[#0B1C2D] px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm cursor-pointer"
           >
-            View Details
+            Event Details
           </Button>
         </div>
       </div>

@@ -345,7 +345,7 @@ export default function EventsPage() {
           <p className="mt-1 text-xs text-gray-500">Required dimensions: 1200 × 600 px. PNG, JPEG, or WebP; max 2 MB.</p>
           <label htmlFor="event-image" className="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-600 hover:border-[#C62828] hover:text-[#C62828]">
             <ImagePlus className="size-4" />
-            Choose banner image
+            {editId ? "Change event banner" : "Choose event banner"}
           </label>
           <input id="event-image" type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => {
             const file = e.target.files?.[0];

@@ -49,6 +49,8 @@ export interface AdminCoach {
 
 export interface AdminPlayer {
   id: string;
+  sportPlayerIds?: Array<{ sport: string; playerId: string }>;
+  recordSource?: "registration";
   name: string;
   email: string;
   phone: string;
@@ -82,6 +84,7 @@ export interface AdminSponsor {
 export interface AdminWellness {
   id: string;
   image: string;
+  description?: string;
   name: string;
   email?: string;
   type: WellnessType;
@@ -95,6 +98,7 @@ export interface AdminWellness {
 export interface AdminMedia {
   id: string;
   thumbnail: string;
+  videoUrl?: string;
   title: string;
   tag: string;
   type: MediaType;

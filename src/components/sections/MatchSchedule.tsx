@@ -89,7 +89,7 @@ export function MatchSchedule({
 }: MatchScheduleProps) {
   return (
     <SectionWrapper id="matches" title={title} subtitle={subtitle}>
-      <CustomTabs tabs={MATCH_TABS} variant="default" centered>
+      <CustomTabs tabs={MATCH_TABS} centered scrollable>
         {(activeTab) => (
           <div className="space-y-4 mt-6">
             {DATA_MAP[activeTab].map((match) => (

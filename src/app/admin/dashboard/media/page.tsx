@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Plus, Search, Edit2, Trash2, RotateCcw } from "lucide-react";
+import Image from "next/image";
+import { Plus, Search, Edit2, Trash2, RotateCcw, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { AdminModal } from "@/components/admin/AdminModal";
@@ -20,7 +22,7 @@ type FormData = Omit<AdminMedia, "id">;
 
 const EMPTY_FORM: FormData = {
   thumbnail: "/images/event-1.png", title: "", tag: "Cricket",
-  type: "videos", duration: "", date: "", status: "published",
+  videoUrl: "", type: "videos", duration: "", date: "", status: "published",
 };
 
 function FieldError({ msg }: { msg?: string }) {
@@ -39,9 +41,28 @@ export default function MediaPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [imageError, setImageError] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  useEffect(() => { setItems(mediaStore.getAll()); }, []);
+  useEffect(() => {
+    let mounted = true;
+    async function loadMedia() {
+      try {
+        const response = await fetch("/api/media?all=true", { cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok || !data.success || !Array.isArray(data.items)) {
+          throw new Error(data.errors?.join(", ") || "Unable to load media.");
+        }
+        if (mounted) setItems(data.items.length ? data.items : mediaStore.getAll());
+      } catch (error) {
+        console.error("Fetch admin media error:", error);
+        toast.error("Could not load media from the server. Showing locally saved items if available.");
+        if (mounted) setItems(mediaStore.getAll());
+      }
+    }
+    void loadMedia();
+    return () => { mounted = false; };
+  }, []);
 
   const filtered = useMemo(() => items.filter((item) => {
     const q = search.toLowerCase();
@@ -53,38 +74,118 @@ export default function MediaPage() {
     );
   }), [items, search, typeFilter, statusFilter, tagFilter]);
 
-  function reload() { setItems(mediaStore.getAll()); }
-
-  function openAdd() { setEditId(null); setForm(EMPTY_FORM); setFormErrors({}); setShowModal(true); }
+  function openAdd() { setEditId(null); setForm(EMPTY_FORM); setFormErrors({}); setImageError(""); setShowModal(true); }
   function openEdit(item: AdminMedia) {
     setEditId(item.id);
-    setForm({ thumbnail: item.thumbnail, title: item.title, tag: item.tag, type: item.type, duration: item.duration, date: item.date, status: item.status });
-    setFormErrors({}); setShowModal(true);
+    setForm({ thumbnail: item.thumbnail, videoUrl: item.videoUrl || "", title: item.title, tag: item.tag, type: item.type, duration: item.duration, date: item.date, status: item.status });
+    setFormErrors({}); setImageError(""); setShowModal(true);
+  }
+
+  async function handleThumbnailChange(file?: File) {
+    setImageError("");
+    if (!file) return;
+    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      setImageError("Choose a PNG, JPEG, or WebP image.");
+      return;
+    }
+    if (file.size === 0 || file.size > 2 * 1024 * 1024) {
+      setImageError("The thumbnail must be 2 MB or smaller.");
+      return;
+    }
+    const previewUrl = URL.createObjectURL(file);
+    try {
+      const dimensions = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+        const preview = new window.Image();
+        preview.onload = () => resolve({ width: preview.naturalWidth, height: preview.naturalHeight });
+        preview.onerror = () => reject(new Error("The selected image could not be read."));
+        preview.src = previewUrl;
+      });
+      if (dimensions.width !== 1200 || dimensions.height !== 600) {
+        setImageError("Use an image that is exactly 1200 × 600 pixels.");
+        return;
+      }
+      const imageData = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("The image could not be read."));
+        reader.onerror = () => reject(new Error("The image could not be read."));
+        reader.readAsDataURL(file);
+      });
+      setForm((current) => ({ ...current, thumbnail: imageData }));
+    } catch (error) {
+      setImageError(error instanceof Error ? error.message : "The selected image could not be read.");
+    } finally {
+      URL.revokeObjectURL(previewUrl);
+    }
   }
 
   function validate(): boolean {
     const errs: Partial<Record<keyof FormData, string>> = {};
+    if (imageError) errs.thumbnail = imageError;
     if (!form.title.trim()) errs.title = "Title is required.";
     if (!form.date.trim()) errs.date = "Date is required.";
+    if (form.videoUrl && !/^https?:\/\/\S+$/i.test(form.videoUrl.trim())) errs.videoUrl = "Enter a valid HTTP or HTTPS video URL.";
     setFormErrors(errs);
     return Object.keys(errs).length === 0;
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (!validate()) return;
-    if (editId) { mediaStore.update(editId, form); } else { mediaStore.add(form); }
-    reload(); setShowModal(false);
+    const isRemoteRecord = Boolean(editId && /^[a-f\d]{24}$/i.test(editId));
+    try {
+      const response = await fetch(isRemoteRecord ? `/api/media/${editId}` : "/api/media", {
+        method: isRemoteRecord ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        toast.error(data.errors?.join(", ") || "Unable to save media.");
+        return;
+      }
+      setItems((current) => {
+        const next = current.filter((item) => item.id !== editId);
+        return [data.item, ...next];
+      });
+      toast.success(editId ? "Media updated." : "Media added.");
+      setShowModal(false);
+    } catch {
+      toast.error("Unable to save media. Please check your connection and try again.");
+    }
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!deleteId) return;
-    mediaStore.remove(deleteId); reload(); setDeleteId(null);
+    try {
+      if (/^[a-f\d]{24}$/i.test(deleteId)) {
+        const response = await fetch(`/api/media/${deleteId}`, { method: "DELETE" });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          toast.error(data.errors?.join(", ") || "Unable to delete media.");
+          return;
+        }
+      } else {
+        mediaStore.remove(deleteId);
+      }
+      setItems((current) => current.filter((item) => item.id !== deleteId));
+      setDeleteId(null);
+      toast.success("Media deleted.");
+    } catch {
+      toast.error("Unable to delete media. Please try again.");
+    }
   }
 
   const columns: TableColumn<AdminMedia>[] = [
     {
       key: "#", label: "#", headerClassName: "text-left w-10",
       render: (_, idx) => <span className="text-gray-400 text-xs">{idx}</span>,
+    },
+    {
+      key: "thumbnail", label: "Thumbnail",
+      render: (item) => (
+        <div className="relative size-14 overflow-hidden rounded-md border border-gray-100 bg-gray-50">
+          <Image src={item.thumbnail} alt="" fill sizes="56px" className="object-cover" />
+        </div>
+      ),
     },
     {
       key: "type", label: "Type", sortable: true, getValue: (item) => item.type,
@@ -214,7 +315,10 @@ export default function MediaPage() {
       {/* Add / Edit Modal */}
       <AdminModal
         open={showModal}
-        onOpenChange={setShowModal}
+        onOpenChange={(open) => {
+          setShowModal(open);
+          if (!open) setImageError("");
+        }}
         title={editId ? "Edit Media" : "Add Media Item"}
         subtitle={editId ? "Update the media details." : "Fill in the details to add a new media item."}
         size="lg"
@@ -226,10 +330,10 @@ export default function MediaPage() {
           <Input className="mt-1.5" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Cricket Championship — Match Highlights" />
           <FieldError msg={formErrors.title} />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label className="text-xs font-medium text-gray-700">Type</Label>
-            <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as MediaType })}>
+            <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as MediaType, videoUrl: v === "photos" ? "" : form.videoUrl })}>
               <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="videos">Video</SelectItem>
@@ -245,7 +349,40 @@ export default function MediaPage() {
             </Select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="media-thumbnail" className="text-xs font-medium text-gray-700">Media Thumbnail</Label>
+          <p className="mt-1 text-xs leading-relaxed text-gray-500">Required dimensions: 1200 × 600 px. PNG, JPEG, or WebP; maximum 2 MB.</p>
+          <label htmlFor="media-thumbnail" className="mt-2 flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-600 transition-colors hover:border-[#C62828] hover:text-[#C62828]">
+            <ImagePlus className="size-4 shrink-0" />
+            {editId ? "Change thumbnail" : "Choose thumbnail"}
+          </label>
+          <input
+            id="media-thumbnail"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="sr-only"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              void handleThumbnailChange(file);
+            }}
+          />
+          {form.thumbnail && (
+            <div className="relative mt-3 aspect-[2/1] overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+              <Image src={form.thumbnail} alt={`${form.title || "Media"} thumbnail preview`} fill unoptimized className="object-cover" />
+            </div>
+          )}
+          <FieldError msg={imageError} />
+        </div>
+        {form.type === "videos" && (
+          <div>
+            <Label htmlFor="media-video-url" className="text-xs font-medium text-gray-700">Video URL</Label>
+            <Input id="media-video-url" className="mt-1.5" type="url" value={form.videoUrl || ""} onChange={(event) => setForm({ ...form, videoUrl: event.target.value })} placeholder="YouTube, Vimeo, or direct video URL" />
+            <p className="mt-1 text-xs text-gray-400">Add a public video link so users can play the video from its card.</p>
+            <FieldError msg={formErrors.videoUrl} />
+          </div>
+        )}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label className="text-xs font-medium text-gray-700">Date <span className="text-red-500">*</span></Label>
             <Input className="mt-1.5" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} placeholder="e.g. Mar 20, 2026" />

@@ -74,6 +74,13 @@ const SPORTS = [
   { name: "Pickleball",  icon: "/images/svg/pickle.png" },
 ];
 
+function getTodayDateInputValue() {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${today.getFullYear()}-${month}-${day}`;
+}
+
 interface FormState {
   fullName: string;
   dob: string;
@@ -270,6 +277,7 @@ export function PlayerRegistration({
               id="dob"
               label="Date of Birth"
               type="date"
+              max={getTodayDateInputValue()}
               required
               value={form.dob}
               onChange={handleChange("dob")}

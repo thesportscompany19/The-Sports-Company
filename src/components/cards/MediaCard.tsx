@@ -9,6 +9,8 @@ export interface MediaCardProps {
   thumbnail: string;
   title: string;
   tag: string;
+  videoUrl?: string;
+  date?: string;
   /** Show play icon overlay for video cards */
   isVideo?: boolean;
   duration?: string;
@@ -20,29 +22,25 @@ export function MediaCard({
   thumbnail,
   title,
   tag,
+  videoUrl,
+  date,
   isVideo = false,
   duration,
   onPlay,
   className,
 }: MediaCardProps) {
   return (
-    <div
+    <button
+      type="button"
       className={cn(
-        "bg-white rounded-xl shadow-sm overflow-hidden flex flex-col cursor-pointer group",
+        "w-full bg-white rounded-xl shadow-sm overflow-hidden flex flex-col text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C62828] focus-visible:ring-offset-2",
         className
       )}
       onClick={onPlay}
-      role={isVideo ? "button" : undefined}
-      aria-label={isVideo ? `Play ${title}` : title}
-      tabIndex={isVideo ? 0 : undefined}
-      onKeyDown={
-        isVideo
-          ? (e) => e.key === "Enter" && onPlay?.()
-          : undefined
-      }
+      aria-label={isVideo ? `Open ${title}${videoUrl ? " video" : " details"}` : `View ${title} photo`}
     >
       {/* Thumbnail */}
-      <div className="relative h-40 w-full bg-gray-200 shrink-0 overflow-hidden">
+      <div className="relative aspect-[2/1] w-full bg-gray-200 shrink-0 overflow-hidden sm:aspect-video">
         <Image
           src={thumbnail}
           alt={title}
@@ -71,7 +69,8 @@ export function MediaCard({
         <Badge className="mt-2 self-start bg-[#C62828] text-white text-xs px-3 py-1 rounded-full border-0 hover:bg-[#C62828]">
           {tag}
         </Badge>
+        {date && <span className="mt-2 text-xs text-gray-500">{date}</span>}
       </div>
-    </div>
+    </button>
   );
 }

@@ -12,9 +12,10 @@ import { AdminModal } from "@/components/admin/AdminModal";
 import { DataTable, type TableColumn } from "@/components/admin/DataTable";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { playersStore, type AdminPlayer, type PlayerStatus } from "@/lib/admin-data";
+import { calculatePlayerAge, isValidPlayerAge } from "@/lib/player-age";
 import { cn } from "@/lib/utils";
 
-const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball", "Chess"];
+const SPORTS = ["Cricket", "Football", "Badminton", "Basketball", "Tennis", "Athletics", "Hockey", "Volleyball", "Chess", "Table Tennis", "Swimming", "Skating", "Pickleball"];
 const STATUSES: PlayerStatus[] = ["active", "pending", "inactive"];
 
 const STATUS_STYLE: Record<PlayerStatus, string> = {
@@ -49,21 +50,71 @@ export default function PlayersPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
-    setIsHydrated(true);
-    setItems(playersStore.getAll());
+    let active = true;
+    async function loadPlayers() {
+      const localPlayers = playersStore.getAll();
+      try {
+        const response = await fetch("/api/players");
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          throw new Error(data.errors?.join(", ") || "Could not load player registrations.");
+        }
+        const registrations: AdminPlayer[] = data.players.map((player: {
+          _id: string;
+          fullName: string;
+          dob: string;
+          gender: string;
+          mobile: string;
+          email: string;
+          sports: string[];
+          paymentStatus: "pending" | "paid" | "failed";
+          sportPlayerIds?: Array<{ sport: string; playerId: string }>;
+          createdAt: string;
+        }) => ({
+          id: player._id,
+          name: player.fullName,
+          email: player.email,
+          phone: player.mobile,
+          sport: player.sports.join(", "),
+          gender: player.gender.charAt(0).toUpperCase() + player.gender.slice(1),
+          age: String(calculatePlayerAge(player.dob) ?? ""),
+          registeredAt: player.createdAt,
+          status: player.paymentStatus === "paid" ? "active" : player.paymentStatus === "pending" ? "pending" : "inactive",
+          sportPlayerIds: player.sportPlayerIds || [],
+          recordSource: "registration",
+        }));
+        if (active) {
+          setItems([...registrations, ...localPlayers]);
+        }
+      } catch (error) {
+        console.error("Player registrations load error:", error);
+        if (active) setItems(localPlayers);
+      } finally {
+        if (active) setIsHydrated(true);
+      }
+    }
+    void loadPlayers();
+    return () => { active = false; };
   }, []);
 
   const filtered = useMemo(() => items.filter((item) => {
     const q = search.toLowerCase();
     return (
-      (!q || item.name.toLowerCase().includes(q) || item.email.toLowerCase().includes(q) || item.phone.includes(q)) &&
-      (sportFilter === "all" || item.sport === sportFilter) &&
+      (!q || item.name.toLowerCase().includes(q) || item.email.toLowerCase().includes(q) || item.phone.includes(q) ||
+        item.sport.toLowerCase().includes(q) ||
+        item.sportPlayerIds?.some(({ playerId }) => playerId.toLowerCase().includes(q))) &&
+      (sportFilter === "all" || item.sport.split(", ").includes(sportFilter)) &&
       (statusFilter === "all" || item.status === statusFilter) &&
       (genderFilter === "all" || item.gender === genderFilter)
     );
   }), [items, search, sportFilter, statusFilter, genderFilter]);
 
-  function reload() { setItems(playersStore.getAll()); }
+  function reload() {
+    setItems((current) => [
+      ...current.filter((item) => item.recordSource === "registration"),
+      ...playersStore.getAll(),
+    ]);
+  }
 
   function openAdd() { setEditId(null); setForm(EMPTY_FORM); setFormErrors({}); setShowModal(true); }
   function openEdit(item: AdminPlayer) {
@@ -79,6 +130,7 @@ export default function PlayersPage() {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { errs.email = "Enter a valid email."; }
     if (!form.phone.trim()) errs.phone = "Phone is required.";
     if (!form.age.trim()) errs.age = "Age is required.";
+    else if (!isValidPlayerAge(form.age)) errs.age = "Enter an age between 0 and 120 years.";
     setFormErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -106,11 +158,23 @@ export default function PlayersPage() {
       render: (_, idx) => <span className="font-medium text-gray-500 text-xs">{String(idx + 1).padStart(2, "0")}</span>,
     },
     {
-      key: "id", label: "Player ID", sortable: true, getValue: (item) => item.id,
+      key: "id", label: "Sport Player IDs", sortable: true,
+      getValue: (item) => item.sportPlayerIds?.map(({ playerId }) => playerId).join(" ") || item.id,
       render: (item) => (
-        <span className="font-mono text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border">
-          {item.id}
-        </span>
+        item.sportPlayerIds?.length ? (
+          <div className="space-y-1">
+            {item.sportPlayerIds.map(({ sport, playerId }) => (
+              <div key={sport} className="whitespace-nowrap">
+                <span className="text-[11px] text-gray-500">{sport}: </span>
+                <span className="font-mono text-xs text-gray-700 bg-gray-50 px-1.5 py-0.5 rounded border">{playerId}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <span className="font-mono text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border">
+            {item.recordSource ? "Assigned after payment" : item.id}
+          </span>
+        )
       ),
     },
     {
@@ -155,7 +219,7 @@ export default function PlayersPage() {
       key: "age", label: "Age", sortable: true, getValue: (item) => Number(item.age) || 0,
       render: (item) => (
         <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
-          {item.age}
+          {isValidPlayerAge(item.age) ? item.age : "—"}
         </span>
       ),
     },
@@ -164,9 +228,13 @@ export default function PlayersPage() {
       render: (item) => (
         <div className="flex items-center gap-2">
           <Trophy className="size-3.5 text-amber-500" />
-          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-            {item.sport}
-          </span>
+          <div className="flex flex-wrap gap-1">
+            {item.sport.split(", ").map((sport) => (
+              <span key={sport} className="inline-block px-2 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                {sport}
+              </span>
+            ))}
+          </div>
         </div>
       ),
     },
@@ -200,22 +268,24 @@ export default function PlayersPage() {
     {
       key: "actions", label: "Actions", headerClassName: "text-center", className: "text-center",
       render: (item) => (
-        <div className="flex items-center justify-center gap-1">
-          <button
-            onClick={() => openEdit(item)}
-            className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-all hover:shadow-sm"
-            title="Edit Player"
-          >
-            <Edit2 className="size-4" />
-          </button>
-          <button
-            onClick={() => setDeleteId(item.id)}
-            className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-all hover:shadow-sm"
-            title="Delete Player"
-          >
-            <Trash2 className="size-4" />
-          </button>
-        </div>
+        item.recordSource ? <span className="text-xs text-gray-400">Payment record</span> : (
+          <div className="flex items-center justify-center gap-1">
+            <button
+              onClick={() => openEdit(item)}
+              className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-all hover:shadow-sm"
+              title="Edit Player"
+            >
+              <Edit2 className="size-4" />
+            </button>
+            <button
+              onClick={() => setDeleteId(item.id)}
+              className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-all hover:shadow-sm"
+              title="Delete Player"
+            >
+              <Trash2 className="size-4" />
+            </button>
+          </div>
+        )
       ),
     },
   ];
@@ -321,7 +391,7 @@ export default function PlayersPage() {
           </div>
           <div>
             <Label className="text-xs font-medium text-gray-700">Age <span className="text-red-500">*</span></Label>
-            <Input className="mt-1.5" type="number" value={form.age} onChange={(e) => setForm({ ...form, age: e.target.value })} placeholder="e.g. 22" />
+            <Input className="mt-1.5" type="number" min="0" max="120" value={form.age} onChange={(e) => setForm({ ...form, age: e.target.value })} placeholder="e.g. 22" />
             <FieldError msg={formErrors.age} />
           </div>
         </div>

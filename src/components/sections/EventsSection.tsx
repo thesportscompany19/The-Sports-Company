@@ -141,7 +141,7 @@ export function EventsSection({
       <Dialog open={Boolean(selectedEvent)} onOpenChange={(open) => !open && setSelectedEvent(null)}>
         {selectedEvent && (
           <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] overflow-y-auto p-0 sm:max-w-2xl">
-            <div className="relative aspect-[2/1] w-full overflow-hidden bg-gray-100">
+            <div className="relative aspect-[2/1] w-full shrink-0 overflow-hidden bg-gray-100">
               <Image
                 src={selectedEvent.image}
                 alt={selectedEvent.title}
@@ -150,7 +150,7 @@ export function EventsSection({
                 className="object-cover"
               />
             </div>
-            <div className="space-y-4 px-4 pb-2 sm:space-y-5 sm:px-6">
+            <div className="space-y-4 px-4 pb-3 sm:space-y-5 sm:px-6">
               <DialogHeader className="pr-7 text-left">
                 <span className="w-fit rounded-full bg-[#C62828]/10 px-3 py-1 text-xs font-semibold text-[#C62828]">
                   {selectedEvent.tag}
@@ -181,7 +181,7 @@ export function EventsSection({
                 </div>
               </div>
             </div>
-            <DialogFooter className="px-4 pb-4 sm:px-6 sm:pb-5">
+            <DialogFooter className="mx-0 mb-0 shrink-0 px-4 pb-4 sm:px-6 sm:pb-5">
               <Button
                 className="w-full bg-[#C62828] text-white hover:bg-[#a82020] sm:w-auto"
                 onClick={() => {

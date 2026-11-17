@@ -37,7 +37,7 @@ export function AdminModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          "grid-rows-[auto_minmax(0,1fr)_auto] max-h-[calc(100dvh-1rem)] p-0 gap-0 overflow-hidden",
+          "grid-rows-[auto_minmax(0,1fr)_auto] max-h-[calc(100dvh-1rem)] p-0 gap-0 overflow-hidden 2xl:max-w-[min(45vw,1200px)]",
           SIZE_CLASSES[size],
         )}
       >

@@ -11,6 +11,7 @@ export interface IPlayer extends Document {
   aadhaar: string;
   coachName?: string;
   sports: string[];
+  sportPlayerIds: Array<{ sport: string; playerId: string }>;
   paymentStatus: "pending" | "paid" | "failed";
   razorpayOrderId?: string;
   razorpayPaymentId?: string;
@@ -30,6 +31,10 @@ const PlayerSchema = new Schema<IPlayer>(
     aadhaar: { type: String, required: true, trim: true },
     coachName: { type: String, trim: true, default: "" },
     sports: { type: [String], required: true, validate: [(v: string[]) => v.length > 0, "Select at least one sport"] },
+    sportPlayerIds: {
+      type: [{ sport: { type: String, required: true }, playerId: { type: String, required: true } }],
+      default: [],
+    },
     paymentStatus: { type: String, enum: ["pending", "paid", "failed"], default: "pending" },
     razorpayOrderId: { type: String, default: "" },
     razorpayPaymentId: { type: String, default: "" },

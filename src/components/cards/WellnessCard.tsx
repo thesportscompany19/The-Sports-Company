@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { Badge } from "@/components/ui/badge";
-import { MapPin } from "lucide-react";
+import { Images, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type WellnessType = "psychologists" | "counselors" | "gyms";
@@ -20,6 +20,7 @@ export interface WellnessCardProps {
   type?: WellnessType;
   discountLabel?: string;
   onBook?: () => void;
+  onDetails?: () => void;
   className?: string;
 }
 
@@ -33,6 +34,7 @@ export function WellnessCard({
   fee,
   discountLabel,
   onBook,
+  onDetails,
   className,
 }: WellnessCardProps) {
   return (
@@ -44,7 +46,18 @@ export function WellnessCard({
     >
       {/* Thumbnail */}
       <div className="relative h-48 w-full shrink-0">
-        <Image src={image} alt={name} fill className="object-cover" />
+        <button
+          type="button"
+          onClick={onDetails}
+          className="group absolute inset-0 z-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C62828]"
+          aria-label={`View details for ${name}`}
+        >
+          <Image src={image} alt={`${name} - ${specialization}`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+          <span className="absolute inset-0 flex items-end justify-center gap-2 bg-gradient-to-t from-black/70 via-transparent to-transparent px-3 pb-3 pt-10 text-sm font-medium text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
+            <Images className="size-4" />
+            View provider details
+          </span>
+        </button>
       </div>
 
       {/* Content */}
@@ -73,10 +86,10 @@ export function WellnessCard({
 
         {/* CTA */}
         <PrimaryButton
-          onClick={onBook}
+          onClick={onDetails || onBook}
           className="w-full py-2 rounded-md mt-3 cursor-pointer"
         >
-          Book Session
+          View Details &amp; Book
         </PrimaryButton>
       </div>
     </div>

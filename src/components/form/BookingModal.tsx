@@ -226,8 +226,8 @@ export function BookingModal({ open, item, onClose, onSuccess }: BookingModalPro
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="p-0 overflow-hidden border-0 shadow-2xl w-[min(96vw,860px)] max-w-[860px] rounded-[32px]">
-        <DialogHeader className="bg-[#0B1C2D] px-6 pt-6 pb-4 text-white">
+      <DialogContent className="flex max-h-[calc(100dvh-1rem)] w-[min(96vw,860px)] max-w-[860px] flex-col overflow-hidden rounded-[24px] border-0 p-0 shadow-2xl sm:rounded-[32px]">
+        <DialogHeader className="shrink-0 bg-[#0B1C2D] px-4 pb-4 pt-5 text-white sm:px-6 sm:pt-6">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
               <Shield className="size-5 text-[#C62828]" />
@@ -243,7 +243,7 @@ export function BookingModal({ open, item, onClose, onSuccess }: BookingModalPro
           </div>
         </DialogHeader>
 
-        <div className="bg-white px-6 py-5 space-y-5">
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain bg-white px-4 py-4 sm:px-6 sm:py-5">
           <div className="rounded-3xl border border-gray-100 bg-slate-50 p-5">
             <div className="flex flex-wrap gap-2 items-center justify-between">
               <div>
@@ -316,11 +316,11 @@ export function BookingModal({ open, item, onClose, onSuccess }: BookingModalPro
           </div>
         </div>
 
-        <DialogFooter className="gap-3 px-6 pb-6 pt-4">
-          <Button variant="outline" onClick={onClose} className="h-11 px-5">
+        <DialogFooter className="mx-0 mb-0 shrink-0 gap-3 px-4 pb-4 pt-3 sm:px-6 sm:pb-6 sm:pt-4">
+          <Button variant="outline" onClick={onClose} className="h-11 w-full px-5 sm:w-auto">
             Cancel
           </Button>
-          <PrimaryButton onClick={handlePay} className="h-11 px-6" disabled={isSubmitting}>
+          <PrimaryButton onClick={handlePay} className="h-11 w-full px-6 sm:w-auto" disabled={isSubmitting}>
             {isSubmitting ? "Processing..." : `Pay ${formatRupee(discountedAmount)}`}
           </PrimaryButton>
         </DialogFooter>

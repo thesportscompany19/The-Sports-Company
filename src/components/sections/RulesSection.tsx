@@ -201,7 +201,7 @@ export function RulesSection({
 }: RulesSectionProps) {
   return (
     <SectionWrapper id="rules" title={title} subtitle={subtitle} className="bg-[#F4F6F8]">
-      <CustomTabs tabs={SPORT_TABS} variant="dark" scrollable>
+      <CustomTabs tabs={SPORT_TABS} centered scrollable>
         {(activeTab) => (
           <RulesContent data={RULES_DATA[activeTab]} />
         )}

@@ -29,7 +29,7 @@ Copy `.env.example` to `.env.local` and replace every placeholder. Do not commit
 3. Add the Razorpay key ID and secret, plus the MongoDB connection string. Use Razorpay test credentials locally and live credentials only in production.
 4. In the admin Coaches and Wellness pages, save a valid email for every provider who should receive booking notifications. The customer and configured organization inboxes are notified for every successful payment.
 
-After Razorpay signature verification succeeds, the server marks the payment paid and sends a branded HTML/text confirmation to the customer, configured organization inboxes, and the relevant coach/wellness provider when their email is available. Player registration confirmations include sports, city, date of birth, and the optional coach name, but never include Aadhaar details. Emails include the service, relevant booking details, Razorpay order ID, payment ID, and amount. SMTP errors are logged separately so a paid transaction is never shown as failed because an email provider is temporarily unavailable.
+After Razorpay signature verification succeeds, the server marks the payment paid and sends a branded HTML/text confirmation to the customer, configured organization inboxes, and the relevant coach/wellness provider when their email is available. Player registration confirmations include a stable sport-specific ID for each selected game (for example, `CHS-2026-<registration-id>` for Chess), along with sports, city, date of birth, and the optional coach name, but never Aadhaar details. Paid legacy registrations receive their IDs when the admin player list is next loaded. Emails include the service, relevant booking details, Razorpay order ID, payment ID, and amount. SMTP errors are logged separately so a paid transaction is never shown as failed because an email provider is temporarily unavailable.
 
 For live testing, configure the SMTP credentials, `COMPANY_EMAIL`, and any `PAYMENT_NOTIFICATION_EMAILS` recipients in the hosting provider's production environment settings, then redeploy. Local `.env.local` values are not automatically available to the live server.
 
@@ -40,6 +40,14 @@ Admin event banners must be PNG, JPEG, or WebP images sized exactly 1200 × 600 
 ## Coach and Academy Galleries
 
 In Admin → Coaches, select multiple PNG, JPEG, or WebP photos when adding or editing a coach. Each image can be up to 2 MB, a single upload can total up to 12 MB, and each coach/academy card can contain up to 10 gallery images. Images are stored in MongoDB and served by the application, so they persist across deployments. On the public Coaches & Academies section, tapping or clicking a card image opens that card's responsive, swipeable gallery with previous/next controls.
+
+## Wellness Provider Banners
+
+Wellness provider records are managed in MongoDB and are shared between the admin panel and the public Wellness & Fitness section. In Admin → Wellness, upload a PNG, JPEG, or WebP banner sized exactly 1200 × 600 pixels (maximum 2 MB), and add provider details for the public confirmation view. Banner bytes are stored in MongoDB. On the public site, choosing **View Details & Book** opens the provider banner and details first; users must choose **Continue to booking** to proceed to checkout.
+
+## Media Gallery
+
+Admin media items are stored in MongoDB and published items appear in the public photo/video tabs. Upload a PNG, JPEG, or WebP thumbnail sized exactly 1200 × 600 pixels (maximum 2 MB). For video entries, add a public YouTube, Vimeo, or direct HTTP(S) video URL; users can open and play supported video links from the media card. Photo cards open a responsive full-image viewer.
 
 ### WhatsApp Notifications
 
