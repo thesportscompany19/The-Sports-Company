@@ -15,6 +15,7 @@ export interface IPlayer extends Document {
   paymentStatus: "pending" | "paid" | "failed";
   razorpayOrderId?: string;
   razorpayPaymentId?: string;
+  __v: number;
   createdAt: Date;
   updatedAt: Date;
 }

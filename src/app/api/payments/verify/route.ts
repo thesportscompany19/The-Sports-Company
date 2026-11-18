@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Player } from "@/models/Player";
-import { createSportPlayerIds } from "@/lib/player-ids";
+import { ensurePlayerSportIds } from "@/lib/player-ids";
 import { sendPaymentEmails } from "@/lib/payment-email";
 import { sendPaymentWhatsApp } from "@/lib/payment-whatsapp";
 
@@ -59,28 +59,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let player = pendingPlayer;
-    if (pendingPlayer.paymentStatus === "paid") {
-      if (!pendingPlayer.sportPlayerIds?.length) {
-        pendingPlayer.sportPlayerIds = createSportPlayerIds(
-          String(pendingPlayer._id),
-          pendingPlayer.sports,
-          pendingPlayer.createdAt
-        );
-        await pendingPlayer.save();
-      }
-    } else {
+    let player = await ensurePlayerSportIds(pendingPlayer);
+    if (player.paymentStatus !== "paid") {
       const updatedPlayer = await Player.findOneAndUpdate(
         { _id: playerId, paymentStatus: { $ne: "paid" } },
-        {
-          paymentStatus: "paid",
-          razorpayPaymentId: razorpay_payment_id,
-          sportPlayerIds: createSportPlayerIds(
-            String(pendingPlayer._id),
-            pendingPlayer.sports,
-            pendingPlayer.createdAt
-          ),
-        },
+        { paymentStatus: "paid", razorpayPaymentId: razorpay_payment_id },
         { new: true }
       );
 
@@ -92,14 +75,10 @@ export async function POST(req: NextRequest) {
             { status: 404 }
           );
         }
-        return NextResponse.json({
-          success: true,
-          message: "Payment verified and registration complete!",
-          playerId: alreadyPaidPlayer._id,
-          sportPlayerIds: alreadyPaidPlayer.sportPlayerIds,
-        });
+        player = alreadyPaidPlayer;
+      } else {
+        player = updatedPlayer;
       }
-      player = updatedPlayer;
     }
 
     if (!player.sportPlayerIds?.length) {
@@ -121,6 +100,7 @@ export async function POST(req: NextRequest) {
         customerPhone: player.mobile, serviceName: "Player Registration", referenceId: String(player._id),
         orderId: player.razorpayOrderId || razorpay_order_id, paymentId: razorpay_payment_id,
         amount: 99, currency: "INR", details: {
+          "Player name": player.fullName,
           Sports: player.sports.join(", "),
           ...sportIdDetails,
           City: player.city,
@@ -135,6 +115,7 @@ export async function POST(req: NextRequest) {
         customerPhone: player.mobile, serviceName: "Player Registration", referenceId: String(player._id),
         orderId: player.razorpayOrderId || razorpay_order_id, paymentId: razorpay_payment_id,
         amount: 99, currency: "INR", details: {
+          "Player name": player.fullName,
           Sports: player.sports.join(", "),
           ...sportIdDetails,
           City: player.city,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Player } from "@/models/Player";
-import { createSportPlayerIds } from "@/lib/player-ids";
+import { ensurePlayerSportIds } from "@/lib/player-ids";
 import { calculatePlayerAge } from "@/lib/player-age";
 
 const VALID_SPORTS = [
@@ -82,34 +82,16 @@ export async function GET() {
   try {
     await connectToDatabase();
     const players = await Player.find()
-      .select("fullName dob gender mobile email city sports paymentStatus sportPlayerIds createdAt")
+      .select("fullName dob gender mobile email city sports paymentStatus sportPlayerIds createdAt __v")
       .sort({ createdAt: -1 })
-      .lean();
+      .exec();
 
-    const legacyPaidPlayers = players.filter((player) =>
-      player.paymentStatus === "paid" && !player.sportPlayerIds?.length
-    );
-    if (legacyPaidPlayers.length) {
-      await Player.bulkWrite(legacyPaidPlayers.map((player) => ({
-        updateOne: {
-          filter: { _id: player._id, $or: [{ sportPlayerIds: { $exists: false } }, { sportPlayerIds: { $size: 0 } }] },
-          update: {
-            $set: {
-              sportPlayerIds: createSportPlayerIds(String(player._id), player.sports, player.createdAt),
-            },
-          },
-        },
-      })));
-      const idsByPlayer = new Map(legacyPaidPlayers.map((player) => [
-        String(player._id),
-        createSportPlayerIds(String(player._id), player.sports, player.createdAt),
-      ]));
-      for (const player of legacyPaidPlayers) {
-        player.sportPlayerIds = idsByPlayer.get(String(player._id)) || [];
-      }
-    }
+    const normalizedPlayers = await Promise.all(players.map(async (player) => {
+      if (player.paymentStatus !== "paid") return player;
+      return ensurePlayerSportIds(player);
+    }));
 
-    return NextResponse.json({ success: true, players });
+    return NextResponse.json({ success: true, players: normalizedPlayers });
   } catch (error) {
     console.error("Fetch players error:", error);
     return NextResponse.json(
